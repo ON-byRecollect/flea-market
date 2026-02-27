@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="商品登録">
     <title>商品登録</title>
+    
     <link rel="icon" href="pen.png" type="image/png">
+    <link rel="apple-touch-icon" href="pen.png">
+    
     <link rel="stylesheet" href="https://static.line-scdn.net/lineseed-jp/edge/fonts.css">
     <style>
         :root { 
@@ -29,7 +33,6 @@
         }
         h1 { font-size: 1.1rem; text-align: center; margin-bottom: 12px; font-weight: 700; }
         
-        /* リセットボタン（赤） */
         .btn-reset { 
             background: var(--error); color: white; width: 100%; padding: 14px; 
             border: none; border-radius: 14px; font-size: 0.9rem; font-weight: 700; 
@@ -48,7 +51,6 @@
         }
         select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
         
-        /* 同梱物の2列・薄グレー・内部改行デザイン */
         .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .checkbox-item { 
             display: flex; align-items: center; justify-content: center; text-align: center;
@@ -64,7 +66,6 @@
 
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         
-        /* 大型コピーボタン */
         button.btn-copy { 
             font-family: var(--font-main); width: 100%; padding: 18px; border: none; border-radius: 14px; 
             font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s;
@@ -84,7 +85,6 @@
             border: 1.5px solid var(--border-color); margin-bottom: 8px;
             word-break: break-all; width: 100%; box-sizing: border-box;
         }
-        /* 本文プレビュー：25文字固定 */
         #output-body { 
             font-size: 13px; width: 325px; box-sizing: content-box; 
             max-width: calc(100% - 32px); padding: 16px; margin-bottom: 8px; 
@@ -218,7 +218,7 @@ const MASTER = {
     colors: { "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"], "12": ["ホワイト", "ブラック"] },
     shipping: { "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" }, "B": { label: "B - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }, "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" } },
     accs: ["未使用バンド（互換品）", "スポーツバンド（アップル純正）", "充電ケーブル（テスト用）", "充電ケーブル（アップル純正）", "イヤーチップ", "ACアダプター", "新品同梱品と同じ", "外箱", "外箱／リーフレット"],
-    details: { watch: { A: ["画面は肉眼でわかる傷、スレ、割れはありません。", "画面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、剥げはありません。", "側面は微細な剥げがありますが、目立つ傷はありません。", "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"], C: ["背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", "背面に微細な剥げがありますが、装着時には気にならない箇所です。", "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"] }, audio: { A: ["ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"], B: ["ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", "ケース内側は、やや使用感がありますが使用に問題はありません。"], C: ["イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"] }, homepod: { A: ["パネル面は肉眼でわかる傷、スレ、割れはありません。", "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、割れはありません。", "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "側面は浅めの傷やスレがありますが、使用に影響はありません。"], C: ["底面は肉眼でわかる傷、スレ、割れはありません。", "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "底面は浅めの傷やスレがありますが、使用に影響はありません。"] }, trackpad: { A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"], B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ、ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"] } }
+    details: { watch: { A: ["画面は肉眼でわかる傷、スレ、割れはありません。", "画面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、剥げはありません。", "側面は微細な剥げがありますが、目立つ傷はありません。", "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"], C: ["背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", "背面に微細な剥げがありますが、装着時には気にならない箇所です。", "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"] }, audio: { A: ["ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"], B: ["ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", "ケース内側は、やや使用感がありますが使用に問題はありません。"], C: ["イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"] }, homepod: { A: ["パネル面は肉眼でわかる傷、スレ、割れはありません。", "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、割れはありません。", "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "側面は浅めの傷やスレがありますが、使用に影響はありません。"], C: ["底面は肉眼でわかる傷、スレ、割れはありません。", "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "底面は浅めの傷やスレがありますが、使用に影響はありません。"] }, trackpad: { A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"], B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ,ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"] } }
 };
 
 function init() {
@@ -342,7 +342,6 @@ function showToast(message) {
 function autoGenerate() {
     if(!validateInputs()) { document.getElementById('output-wrapper').classList.add('hidden'); return; }
     const pid = document.getElementById('productId').value; const cond = document.getElementById('condition').value; const ship = document.getElementById('shippingRank').value; const p = PRODUCTS[pid]; const charging = document.getElementById('chargingMethod').value; const spec = document.getElementById('spec').value; const size = document.getElementById('size').value; const color = document.getElementById('color').value; const kw = getKeywords(pid, spec, charging, color); const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value); const isNewBundle = checkedAccs.includes("新品同梱品と同じ"); const isNewCond = cond === "未開封の「新品／未使用」状態";
-    
     const titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
     let bodyText = titleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n・本体\n";
     if(isNewBundle) bodyText = bodyText.replace("・本体\n", ""); checkedAccs.forEach(a => bodyText += `・${a}\n`); if(!isNewBundle) bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
