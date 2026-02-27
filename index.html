@@ -37,12 +37,7 @@
         }
         select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
         
-        /* 同梱物のデザイン改善 */
-        .checkbox-group { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 8px; 
-        }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .checkbox-item { 
             display: flex; align-items: center; justify-content: center; text-align: center;
             padding: 12px 6px; min-height: 64px;
@@ -65,25 +60,33 @@
         .btn-secondary { background: #e2e2e9; color: #1c1c1e; }
         button:active { transform: scale(0.98); opacity: 0.9; }
 
-        .output-wrapper { margin-top: 24px; }
+        /* 生成エリアの中央揃えと最適化 */
+        .output-wrapper { 
+            margin-top: 24px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; /* ラベルとボックスを中央に寄せる */
+        }
         .output-box { 
             padding: 18px; background: #fff; color: #1c1c1e; font-family: var(--font-main); 
             font-size: 0.85rem; white-space: pre-wrap; border-radius: 16px; 
             border: 1.5px solid var(--border-color); margin-bottom: 8px;
             word-break: break-all;
+            width: 100%; /* デフォルトは幅一杯 */
+            box-sizing: border-box;
         }
         
+        /* 本文プレビュー窓の25文字固定と完全中央揃え */
         #output-body {
-            font-size: 13px; 
-            width: 25em; 
+            font-size: 12.5px; /* 全25文字がiPhone画面に収まるサイズ */
+            width: 25em; /* 全角25文字分 */
             max-width: 100%; 
-            padding: 12px;
-            margin: 0 auto 8px auto;
-            box-sizing: content-box;
+            padding: 16px;
+            margin-bottom: 8px;
         }
 
-        .output-label { font-size: 0.8rem; font-weight: 700; color: #8e8e93; margin-bottom: 6px; display: block; }
-        .char-count { text-align: right; font-size: 0.75rem; color: #8e8e93; font-weight: 500; margin-bottom: 16px; }
+        .output-label { font-size: 0.8rem; font-weight: 700; color: #8e8e93; margin-bottom: 6px; align-self: flex-start; }
+        .char-count { width: 100%; text-align: right; font-size: 0.75rem; color: #8e8e93; font-weight: 500; margin-bottom: 16px; }
         .count-over { color: var(--error); font-weight: 700; }
         .required { color: var(--error); margin-left: 4px; }
     </style>
@@ -196,11 +199,11 @@
 </div>
 
 <script>
-// マスターデータ
 const PRODUCTS = {
   "1": { name: "Apple Watch SE 第2世代", cat: "watch" }, "2": { name: "Apple Watch SE 第3世代", cat: "watch" }, "3": { name: "Apple Watch Series 10", cat: "watch" }, "4": { name: "Apple Watch Series 11", cat: "watch" }, "5": { name: "Apple AirPods 4", cat: "airpods" }, "6": { name: "Apple AirPods 4 ANC", cat: "airpods" }, "7": { name: "Apple AirPods Pro 第2世代", cat: "airpods" }, "8": { name: "Apple AirPods Pro 第3世代", cat: "airpods" }, "9": { name: "Apple Pencil 第1世代", cat: "pencil" }, "10": { name: "Apple Pencil 第2世代", cat: "pencil" }, "11": { name: "Apple HomePod mini", cat: "homepod" }, "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" },
 };
 const MASTER = {
+    // スペック順をGPS優先に変更
     specs: { "1": ["GPS", "GPS Cellular"], "2": ["GPS", "GPS Cellular"], "3": ["GPS", "GPS Cellular"], "4": ["GPS", "GPS Cellular"], "7": ["Lightning", "USB-C"] }, charging: { "12": ["Lightning", "USB-C"] }, sizes: { "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] },
     colors: { "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"], "12": ["ホワイト", "ブラック"] },
     shipping: { "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" }, "B": { label: "B - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }, "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" } },
@@ -212,18 +215,15 @@ function init() {
     const pSel = document.getElementById('productId');
     pSel.innerHTML = '<option value="">選択してください</option>';
     Object.entries(PRODUCTS).forEach(([id, p]) => pSel.innerHTML += `<option value="${id}">${p.name}</option>`);
-    
     const accGroup = document.getElementById('accessoriesGroup');
     accGroup.innerHTML = '';
     MASTER.accs.forEach(a => {
-        // UI表示用のラベル整形（カッコの前やスラッシュの後で改行）
         const displayLabel = a.replace('（', '<br>（').replace('／', '／<br>').replace('と', 'と<br>');
         const label = document.createElement('label');
         label.className = 'checkbox-item';
         label.innerHTML = `<input type="checkbox" value="${a}" onchange="updateUI()"><span class="checkbox-label">${displayLabel}</span>`;
         accGroup.appendChild(label);
     });
-
     const sRank = document.getElementById('shippingRank');
     sRank.innerHTML = '<option value="">選択してください</option>';
     Object.entries(MASTER.shipping).forEach(([id, r]) => sRank.innerHTML += `<option value="${id}">${r.label}</option>`);
@@ -316,13 +316,11 @@ function processCopy(type) {
     
     let bodyText = titleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n・本体\n";
     if(isNewBundle) bodyText = bodyText.replace("・本体\n", ""); checkedAccs.forEach(a => bodyText += `・${a}\n`); if(!isNewBundle) bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
-    
     bodyText += `\n【外観状態】\n■${cond}\n`;
     if(!isNewCond) { 
         if(["9", "10"].includes(pid)) bodyText += "新品未開封の状態です。\n"; 
         else { bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`; if(pid !== "12") bodyText += `${document.getElementById('detailC').value}\n`; } 
-        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; 
-        if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } 
+        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } 
         bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
     }
     const bVal = document.getElementById('battery').value; let batteryLine = ""; let hasNotesText = false;
@@ -335,7 +333,7 @@ function processCopy(type) {
     bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n" + MASTER.shipping[ship].text + "\n\n";
     if(checkedAccs.includes("充電ケーブル（テスト用）")) bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
     if(isNewCond) bodyText += "※新品・未開封品ですが、あくまでも二次流通品となります。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。"; 
-    else bodyText += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n　価格交渉は,販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
+    else bodyText += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
 
     document.getElementById('output-wrapper').classList.remove('hidden');
     document.getElementById('output-title').innerText = titleLine;
