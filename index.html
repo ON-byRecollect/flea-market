@@ -62,15 +62,19 @@
         .output-box { 
             padding: 18px; background: #fff; color: #1c1c1e; font-family: var(--font-main); 
             font-size: 0.85rem; white-space: pre-wrap; border-radius: 16px; 
-            border: 1.5px solid var(--border-color); margin-bottom: 16px;
+            border: 1.5px solid var(--border-color); margin-bottom: 8px;
+            word-break: break-all;
         }
-        .output-label { font-size: 0.8rem; font-weight: 700; color: #8e8e93; margin-bottom: 6px; display: block; }
         
-        /* 文字数カウンターのスタイル */
-        .char-count-container {
-            margin-top: 15px; display: flex; flex-direction: column; gap: 4px;
-            text-align: right; font-size: 0.8rem; color: #8e8e93; font-weight: 500;
+        /* 本文プレビュー窓を25文字分で固定 */
+        #output-body {
+            width: 25em;
+            max-width: 100%;
+            box-sizing: content-box;
         }
+
+        .output-label { font-size: 0.8rem; font-weight: 700; color: #8e8e93; margin-bottom: 6px; display: block; }
+        .char-count { text-align: right; font-size: 0.75rem; color: #8e8e93; font-weight: 500; margin-bottom: 16px; }
         .count-over { color: var(--error); font-weight: 700; }
         .required { color: var(--error); margin-left: 4px; }
     </style>
@@ -130,10 +134,10 @@
         <select id="condition" onchange="updateUI()">
             <option value="">選択してください</option>
             <option value="未開封の「新品／未使用」状態">新品</option>
-            <option value="■使用感が少ない「未使用に近い」状態">未使用に近い</option>
-            <option value="■目立つ傷、スレがない「とても良好」な状態">とても良好</option>
-            <option value="■小傷、微スレありますが「致命傷のない」状態">致命傷なし</option>
-            <option value="■傷、スレありますが「十分に使用可能」な状態">使用可能</option>
+            <option value="使用感が少ない「未使用に近い」状態">未使用に近い</option>
+            <option value="目立つ傷、スレがない「とても良好」な状態">とても良好</option>
+            <option value="小傷、微スレありますが「致命傷のない」状態">致命傷なし</option>
+            <option value="傷、スレありますが「十分に使用可能」な状態">使用可能</option>
         </select>
         <div id="appearancePanel">
             <div id="boxA"><label id="labelA">詳細A <span class="required">*</span></label><select id="detailA"></select></div>
@@ -174,12 +178,11 @@
     <div id="output-wrapper" class="output-wrapper hidden">
         <span class="output-label">商品タイトル</span>
         <div id="output-title" class="output-box"></div>
-        <span class="output-label">商品説明（本文）</span>
+        <div id="title-char-count" class="char-count">タイトル: 0/65</div>
+
+        <span class="output-label">商品説明（プレビュー：25文字で折り返し）</span>
         <div id="output-body" class="output-box"></div>
-        <div class="char-count-container">
-            <div id="title-char-count">タイトル: 0/65</div>
-            <div id="body-char-count">本文: 0/1000</div>
-        </div>
+        <div id="body-char-count" class="char-count">本文: 0/1000</div>
     </div>
 </div>
 
@@ -193,7 +196,12 @@ const MASTER = {
     colors: { "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"], "12": ["ホワイト", "ブラック"] },
     shipping: { "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" }, "B": { label: "B - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }, "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" } },
     accs: ["未使用バンド（互換品）", "スポーツバンド（アップル純正）", "充電ケーブル（テスト用）", "充電ケーブル（アップル純正）", "イヤーチップ", "ACアダプター", "新品同梱品と同じ", "外箱", "外箱／リーフレット"],
-    details: { watch: { A: ["画面は肉眼でわかる傷、スレ、割れはありません。", "画面は肉眼では気にならない程度の薄いスレがありますが,目立つ傷はありません。", "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、剥げはありません。", "側面は微細な剥げがありますが、目立つ傷はありません。", "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"], C: ["背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", "背面に微細な剥げがありますが、装着時には気にならない箇所です。", "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"] }, audio: { A: ["ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"], B: ["ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", "ケース内側は、やや使用感がありますが使用に問題はありません。"], C: ["イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"] }, homepod: { A: ["パネル面は肉眼でわかる傷、スレ、割れはありません。", "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、割れはありません。", "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "側面は浅めの傷やスレがありますが、使用に影響はありません。"], C: ["底面は肉眼でわかる傷、スレ、割れはありません。", "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "底面は浅めの傷やスレがありますが、使用に影響はありません。"] }, trackpad: { A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"], B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ,ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"] } }
+    details: { 
+        watch: { A: ["画面は肉眼でわかる傷、スレ、割れはありません。", "画面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、剥げはありません。", "側面は微細な剥げがありますが、目立つ傷はありません。", "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"], C: ["背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", "背面に微細な剥げがありますが、装着時には気にならない箇所です。", "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"] }, 
+        audio: { A: ["ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"], B: ["ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", "ケース内側は、やや使用感がありますが使用に問題はありません。"], C: ["イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"] }, 
+        homepod: { A: ["パネル面は肉眼でわかる傷、スレ、割れはありません。", "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、割れはありません。", "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "側面は浅めの傷やスレがありますが、使用に影響はありません。"], C: ["底面は肉眼でわかる傷、スレ、割れはありません。", "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "底面は浅めの傷やスレがありますが、使用に影響はありません。"] }, 
+        trackpad: { A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"], B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ、ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"] } 
+    }
 };
 
 function init() {
@@ -224,10 +232,13 @@ function updateUI() {
     const spec = document.getElementById('spec').value;
     const isUnopened = condSelect.value === "未開封の「新品／未使用」状態";
     if(!pid) return;
+
     const toggle = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
     toggle('wrapperCharging', MASTER.charging[pid]); toggle('wrapperSpec', MASTER.specs[pid]); toggle('wrapperSize', MASTER.sizes[pid]); toggle('wrapperColor', MASTER.colors[pid]); toggle('wrapperNet', spec === "GPS Cellular"); toggle('wrapperBattery', pid !== "11");
+
     fillSelectOnce('chargingMethod', MASTER.charging[pid]); fillSelectOnce('spec', MASTER.specs[pid]); fillSelectOnce('size', MASTER.sizes[pid]); fillSelectOnce('color', MASTER.colors[pid]);
     document.getElementById('batteryLabel').innerHTML = (["5", "6", "7", "8", "12"].includes(pid) ? "10分間の消費バッテリー（%）" : "バッテリー最大容量（%）") + ' <span class="required">*</span>';
+    
     const isPencil = ["9", "10"].includes(pid);
     const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
     if (isPencil) {
@@ -296,42 +307,49 @@ function processCopy(type) {
     const errorMsg = validateInputs(); if(errorMsg) return alert(errorMsg);
     const pid = document.getElementById('productId').value; const cond = document.getElementById('condition').value; const ship = document.getElementById('shippingRank').value; const p = PRODUCTS[pid]; const charging = document.getElementById('chargingMethod').value; const spec = document.getElementById('spec').value; const size = document.getElementById('size').value; const color = document.getElementById('color').value; const kw = getKeywords(pid, spec, charging, color); const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value); const isNewBundle = checkedAccs.includes("新品同梱品と同じ"); const isNewCond = cond === "未開封の「新品／未使用」状態";
     
-    // 生成ロジック
     const titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
-    let bodyText = "\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n・本体\n";
+    
+    // 読点「、」への統一
+    let bodyText = titleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n・本体\n";
     if(isNewBundle) bodyText = bodyText.replace("・本体\n", ""); checkedAccs.forEach(a => bodyText += `・${a}\n`); if(!isNewBundle) bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
+    
     bodyText += `\n【外観状態】\n■${cond}\n`;
-    if(!isNewCond) { if(["9", "10"].includes(pid)) bodyText += "新品未開封の状態です。\n"; else { bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`; if(pid !== "12") bodyText += `${document.getElementById('detailC').value}\n`; } const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は,ありません。\n"; }
+    if(!isNewCond) { 
+        if(["9", "10"].includes(pid)) bodyText += "新品未開封の状態です。\n"; 
+        else { bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`; if(pid !== "12") bodyText += `${document.getElementById('detailC').value}\n`; } 
+        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
+    }
+    
     const bVal = document.getElementById('battery').value; let batteryLine = ""; let hasNotesText = false;
     if(pid !== "11" && bVal) { const bNum = parseInt(bVal); if(["5", "6", "7", "8"].includes(pid)) { batteryLine = `・バッテリーは、10分の音楽再生で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`; hasNotesText = true; } else if(pid === "12") { batteryLine = `・バッテリーは、10分の接続で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`; hasNotesText = true; } else { batteryLine = `・バッテリー最大容量は「${bNum}%」です。\n`; } }
     if (hasNotesText) batteryLine += "\n"; bodyText += batteryLine;
+    
     let initLine = ""; if (!isNewBundle) { const name = p.name; if (["Apple AirPods 4 ANC", "Apple AirPods 4", "Apple AirPods Pro 第2世代", "Apple AirPods Pro 第3世代"].includes(name)) initLine = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n"; else if (["Apple Watch SE 第2世代", "Apple Watch SE 第3世代", "Apple Watch Series 10", "Apple Watch Series 11"].includes(name)) initLine = "・本体の初期化、アクティベーションロック解除済み\n"; else if (name === "Apple HomePod mini") initLine = "・本体の初期化、アカウント連携解除済み\n"; else if (["Apple Magic Trackpad 3 (Multi-Touch対応)", "Apple Pencil 第1世代", "Apple Pencil 第2世代"].includes(name)) initLine = "・本体のリセット済み\n"; }
     bodyText += initLine;
+    
     if (spec === "GPS Cellular") { const net = document.getElementById('netRestriction').value; if (net) { bodyText += `\n■ネットワーク利用制限「${net}」\n`; bodyText += (net === "○") ? "（国内キャリア版で残債／利用制限ありません）\n" : "（Apple直販の国内版で利用制限はかかっていません）\n"; } }
     const warranty = document.getElementById('warranty').value; if(warranty) { bodyText += `\n■${warranty}\n`; const wMsg = (warranty === "Apple Care Service") ? "（AppleCare+の通信キャリア版で保証内容は同等です）" : (warranty === "AppleCare+" ? "（故障・盗難・紛失時に割安でサポート対応）" : "（Appleの保証サービス）"); bodyText += `${wMsg}\n`; }
-    bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は,翌日発送となります。\n\n" + MASTER.shipping[ship].text + "\n\n";
-    if(checkedAccs.includes("充電ケーブル（テスト用）")) bodyText += "※充電ケーブル（テスト用）は,受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
+    
+    bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n" + MASTER.shipping[ship].text + "\n\n";
+    if(checkedAccs.includes("充電ケーブル（テスト用）")) bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
     if(isNewCond) bodyText += "※新品・未開封品ですが、あくまでも二次流通品となります。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。"; else bodyText += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
 
-    // 表示とカウント更新
     document.getElementById('output-wrapper').classList.remove('hidden');
     document.getElementById('output-title').innerText = titleLine;
     document.getElementById('output-body').innerText = bodyText;
     
-    // 文字数カウント更新ロジック
-    const updateCount = (id, current, max) => {
+    const updateCount = (id, current, max, label) => {
         const el = document.getElementById(id);
         const countSpan = `<span class="${current > max ? 'count-over' : ''}">${current}</span>`;
-        el.innerHTML = `${id === 'title-char-count' ? 'タイトル' : '本文'}: ${countSpan}/${max}`;
+        el.innerHTML = `${label}: ${countSpan}/${max}`;
     };
-    updateCount('title-char-count', titleLine.length, 65);
-    updateCount('body-char-count', bodyText.length, 1000);
+    updateCount('title-char-count', titleLine.length, 65, 'タイトル');
+    updateCount('body-char-count', bodyText.length, 1000, '本文');
 
-    // コピー処理
     if (type === 'title') {
         navigator.clipboard.writeText(titleLine).then(() => alert("タイトルをコピーしました！"));
     } else {
-        navigator.clipboard.writeText(titleLine + "\n" + bodyText).then(() => alert("本文をコピーしました！"));
+        navigator.clipboard.writeText(bodyText).then(() => alert("本文をコピーしました！"));
     }
 }
 init();
