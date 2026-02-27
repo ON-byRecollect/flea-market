@@ -28,7 +28,6 @@
         }
         h1 { font-size: 1.1rem; text-align: center; margin-bottom: 12px; font-weight: 700; }
         
-        /* リセットボタンのスタイル */
         .btn-reset { 
             background: var(--error); color: white; width: 100%; padding: 14px; 
             border: none; border-radius: 14px; font-size: 0.9rem; font-weight: 700; 
@@ -207,7 +206,6 @@
 <div id="toast"></div>
 
 <script>
-// マスターデータ
 const PRODUCTS = { "1": { name: "Apple Watch SE 第2世代", cat: "watch" }, "2": { name: "Apple Watch SE 第3世代", cat: "watch" }, "3": { name: "Apple Watch Series 10", cat: "watch" }, "4": { name: "Apple Watch Series 11", cat: "watch" }, "5": { name: "Apple AirPods 4", cat: "airpods" }, "6": { name: "Apple AirPods 4 ANC", cat: "airpods" }, "7": { name: "Apple AirPods Pro 第2世代", cat: "airpods" }, "8": { name: "Apple AirPods Pro 第3世代", cat: "airpods" }, "9": { name: "Apple Pencil 第1世代", cat: "pencil" }, "10": { name: "Apple Pencil 第2世代", cat: "pencil" }, "11": { name: "Apple HomePod mini", cat: "homepod" }, "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" } };
 const MASTER = {
     specs: { "1": ["GPS", "GPS Cellular"], "2": ["GPS", "GPS Cellular"], "3": ["GPS", "GPS Cellular"], "4": ["GPS", "GPS Cellular"], "7": ["Lightning", "USB-C"] }, charging: { "12": ["Lightning", "USB-C"] }, sizes: { "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] },
@@ -240,9 +238,8 @@ function resetAndFillUI() {
     updateUI();
 }
 
-// すべてをリセットする関数
 function resetAll() {
-    if (!confirm('入力内容をすべて消去しますか？')) return;
+    // 確認ダイアログを削除し、即実行
     document.getElementById('productId').value = "";
     resetAndFillUI();
     const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
@@ -253,7 +250,7 @@ function resetAll() {
     });
     ['detailA', 'detailB', 'detailC'].forEach(id => document.getElementById(id).innerHTML = "");
     updateUI();
-    autoGenerate(); // バリデーション失敗によりプレビューを隠す
+    autoGenerate(); 
     showToast("リセットしました");
 }
 
@@ -340,6 +337,7 @@ function showToast(message) {
 function autoGenerate() {
     if(!validateInputs()) { document.getElementById('output-wrapper').classList.add('hidden'); return; }
     const pid = document.getElementById('productId').value; const cond = document.getElementById('condition').value; const ship = document.getElementById('shippingRank').value; const p = PRODUCTS[pid]; const charging = document.getElementById('chargingMethod').value; const spec = document.getElementById('spec').value; const size = document.getElementById('size').value; const color = document.getElementById('color').value; const kw = getKeywords(pid, spec, charging, color); const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value); const isNewBundle = checkedAccs.includes("新品同梱品と同じ"); const isNewCond = cond === "未開封の「新品／未使用」状態";
+    
     const titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
     let bodyText = titleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n・本体\n";
     if(isNewBundle) bodyText = bodyText.replace("・本体\n", ""); checkedAccs.forEach(a => bodyText += `・${a}\n`); if(!isNewBundle) bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
@@ -347,7 +345,7 @@ function autoGenerate() {
     if(!isNewCond) { 
         if(["9", "10"].includes(pid)) bodyText += "新品未開封の状態です。\n"; 
         else { bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`; if(pid !== "12") bodyText += `${document.getElementById('detailC').value}\n`; } 
-        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } 
+        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; 
         bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
     }
     const bVal = document.getElementById('battery').value; let batteryLine = ""; let hasNotesText = false;
@@ -361,6 +359,7 @@ function autoGenerate() {
     if(checkedAccs.includes("充電ケーブル（テスト用）")) bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
     if(isNewCond) bodyText += "※新品・未開封品ですが、あくまでも二次流通品となります。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。"; 
     else bodyText += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
+
     document.getElementById('output-wrapper').classList.remove('hidden');
     document.getElementById('output-title').innerText = titleLine;
     document.getElementById('output-body').innerText = bodyText;
