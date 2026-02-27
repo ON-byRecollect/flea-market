@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>フリマ商品説明作成ツール v9.2</title>
+    <title>フリマ商品説明作成ツール v9.5</title>
     <link rel="stylesheet" href="https://static.line-scdn.net/lineseed-jp/edge/fonts.css">
     <style>
         :root { 
@@ -29,9 +29,11 @@
             font-family: var(--font-main); width: 100%; padding: 14px; border: 1.5px solid #e2e2e9; 
             border-radius: 12px; font-size: 1rem; box-sizing: border-box; margin-bottom: 12px; background: #fff; 
         }
+        select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
         .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .checkbox-item { display: flex; align-items: center; font-size: 0.85rem; background: #f8f8fc; padding: 10px; border-radius: 10px; }
         .checkbox-item input { width: 22px; height: 22px; margin-right: 10px; accent-color: var(--accent); }
+        .checkbox-item input:disabled { opacity: 0.5; }
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; }
         button { 
             font-family: var(--font-main); width: 100%; padding: 18px; background: var(--primary); 
@@ -49,7 +51,7 @@
 <body>
 
 <div class="container">
-    <h1>商品説明ジェネレーター v9.2</h1>
+    <h1>商品説明ジェネレーター v9.5</h1>
 
     <div class="section">
         <label>商品名 <span class="required">*</span></label>
@@ -105,11 +107,11 @@
         <label>外観状態 <span class="required">*</span></label>
         <select id="condition" onchange="updateUI()">
             <option value="">選択してください</option>
-            <option value="未開封の「新品／未使用」状態">未開封の「新品／未使用」</option>
-            <option value="使用感が少ない「未使用に近い」状態">未使用に近い</option>
-            <option value="目立つ傷、スレがない「とても良好」な状態">とても良好</option>
-            <option value="小傷、微スレありますが「致命傷のない」状態">致命傷なし</option>
-            <option value="傷、スレありますが「十分に使用可能」な状態">使用可能</option>
+            <option value="未開封の「新品／未使用」状態">新品</option>
+            <option value="■使用感が少ない「未使用に近い」状態">未使用に近い</option>
+            <option value="■目立つ傷、スレがない「とても良好」な状態">とても良好</option>
+            <option value="■小傷、微スレありますが「致命傷のない」状態">致命傷なし</option>
+            <option value="■傷、スレありますが「十分に使用可能」な状態">使用可能</option>
         </select>
         <div id="appearancePanel">
             <div id="boxA"><label id="labelA">詳細A</label><select id="detailA"></select></div>
@@ -185,7 +187,7 @@ const MASTER = {
         watch: { A: ["画面は肉眼でわかる傷、スレ、割れはありません。", "画面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、剥げはありません。", "側面は微細な剥げがありますが、目立つ傷はありません。", "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"], C: ["背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", "背面に微細な剥げがありますが、装着時には気にならない箇所です。", "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"] },
         audio: { A: ["ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"], B: ["ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", "ケース内側は、やや使用感がありますが使用に問題はありません。"], C: ["イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"] },
         homepod: { A: ["パネル面は肉眼でわかる傷、スレ、割れはありません。", "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、割れはありません。", "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "側面は浅めの傷やスレがありますが、使用に影響はありません。"], C: ["底面は肉眼でわかる傷、スレ、割れはありません。", "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "底面は浅めの傷やスレがありますが、使用に影響はありません。"] },
-        trackpad: { A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"], B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ、ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"] }
+        trackpad: { A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"], B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ,ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"] }
     }
 };
 
@@ -210,18 +212,18 @@ function resetAndFillUI() {
 
 function updateUI() {
     const pid = document.getElementById('productId').value;
-    const cond = document.getElementById('condition').value;
+    const condSelect = document.getElementById('condition');
+    const condValue = condSelect.value;
     const spec = document.getElementById('spec').value;
-    const isUnopened = cond === "未開封の「新品／未使用」状態";
+    const isUnopened = condValue === "未開封の「新品／未使用」状態";
     if(!pid) return;
+
     const toggle = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
     toggle('wrapperCharging', MASTER.charging[pid]);
     toggle('wrapperSpec', MASTER.specs[pid]);
     toggle('wrapperSize', MASTER.sizes[pid]);
     toggle('wrapperColor', MASTER.colors[pid]);
     toggle('wrapperNet', spec === "GPS Cellular");
-    
-    // HomePod miniの時はバッテリー入力欄を削除
     toggle('wrapperBattery', pid !== "11");
 
     fillSelectOnce('chargingMethod', MASTER.charging[pid]);
@@ -231,14 +233,28 @@ function updateUI() {
     document.getElementById('batteryLabel').innerText = ["5", "6", "7", "8", "12"].includes(pid) ? "10分間の消費バッテリー（%）" : "バッテリー最大容量（%）";
     
     const isPencil = ["9", "10"].includes(pid);
-    toggle('appearancePanel', pid && !isUnopened && !isPencil);
-    if(pid && !isUnopened && !isPencil) {
-        const type = PRODUCTS[pid].cat;
-        const boxC = document.getElementById('boxC');
-        if(pid === "12") boxC.classList.add('hidden'); else boxC.classList.remove('hidden');
-        ['boxA','boxB'].forEach(id => document.getElementById(id).classList.remove('hidden'));
-        const group = MASTER.details[type === "pencil" ? "audio" : (type === "watch" ? "watch" : (type === "airpods" ? "audio" : type))];
-        if(group) { fillDetail('A', group.A); fillDetail('B', group.B); fillDetail('C', group.C); }
+    const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
+    
+    if (isPencil) {
+        condSelect.value = "未開封の「新品／未使用」状態";
+        condSelect.disabled = true;
+        accCheckboxes.forEach(cb => {
+            cb.checked = (cb.value === "新品同梱品と同じ");
+            cb.disabled = true;
+        });
+        toggle('appearancePanel', false);
+    } else {
+        condSelect.disabled = false;
+        accCheckboxes.forEach(cb => cb.disabled = false);
+        toggle('appearancePanel', pid && !isUnopened);
+        if(pid && !isUnopened) {
+            const type = PRODUCTS[pid].cat;
+            const boxC = document.getElementById('boxC');
+            if(pid === "12") boxC.classList.add('hidden'); else boxC.classList.remove('hidden');
+            ['boxA','boxB'].forEach(id => document.getElementById(id).classList.remove('hidden'));
+            const group = MASTER.details[type === "pencil" ? "audio" : (type === "watch" ? "watch" : (type === "airpods" ? "audio" : type))];
+            if(group) { fillDetail('A', group.A); fillDetail('B', group.B); fillDetail('C', group.C); }
+        }
     }
     const hasGenuine = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).some(i => i.value === "スポーツバンド（アップル純正）");
     toggle('bandDetails', hasGenuine);
@@ -289,6 +305,7 @@ function generate() {
     const kw = getKeywords(pid, spec, charging, color);
     const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value);
     const isNewBundle = checkedAccs.includes("新品同梱品と同じ");
+    const isNewCond = cond === "未開封の「新品／未使用」状態";
 
     let text = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim() + "\n";
     text += "\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n";
@@ -298,7 +315,7 @@ function generate() {
     if(!isNewBundle) text += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
 
     text += `\n【外観状態】\n■${cond}\n`;
-    if(cond !== "未開封の「新品／未使用」状態") {
+    if(!isNewCond) {
         if(["9", "10"].includes(pid)) text += "新品未開封の状態です。\n";
         else {
             text += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`;
@@ -315,22 +332,36 @@ function generate() {
         text += "\n※簡易清掃を行なった上で、撮影を行なっています。\n画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は,ありません。\n";
     }
 
+    // =====================================
+    // バッテリー情報と注釈のロジック (v9.5 修正点)
+    // =====================================
     const bVal = document.getElementById('battery').value;
     let batteryLine = "";
-    // HomePod mini以外かつ数値がある場合のみ出力
+    let hasNotesText = false; // 「※製品仕様上...」の注釈があるかフラグ
+
     if(pid !== "11" && bVal) {
         const bNum = parseInt(bVal);
-        if(["5", "6", "7", "8"].includes(pid)) batteryLine = `・バッテリーは、10分の音楽再生で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
-        else if(pid === "12") batteryLine = `・バッテリーは、10分の接続で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
-        else batteryLine = `・バッテリー最大容量は「${bNum}%」です。\n`;
+        if(["5", "6", "7", "8"].includes(pid)) {
+            batteryLine = `・バッテリーは、10分の音楽再生で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
+            hasNotesText = true;
+        } else if(pid === "12") {
+            batteryLine = `・バッテリーは、10分の接続で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
+            hasNotesText = true;
+        } else {
+            batteryLine = `・バッテリー最大容量は「${bNum}%」です。\n`;
+            hasNotesText = false;
+        }
+    }
+    
+    // 注釈テキストがある場合のみ、次の行との間に空行を入れる
+    if (hasNotesText) {
+        batteryLine += "\n";
     }
     text += batteryLine;
 
-    // =====================================
-    // 初期化ロジック (提供されたIFS数式の完全移植)
-    // =====================================
+    // 初期化ロジック
     let initLine = "";
-    if (!isNewBundle) { // 「新品同梱品と同じ」がない場合のみ処理
+    if (!isNewBundle) {
         const name = p.name;
         if (["Apple AirPods 4 ANC", "Apple AirPods 4", "Apple AirPods Pro 第2世代", "Apple AirPods Pro 第3世代"].includes(name)) {
             initLine = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
@@ -362,8 +393,12 @@ function generate() {
     text += "・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n";
     text += MASTER.shipping[ship].text + "\n\n";
     if(checkedAccs.includes("充電ケーブル（テスト用）")) text += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
-    if(isNewBundle) text += "※新品・未開封品ですが、あくまでも二次流通品となります。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。";
-    else text += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
+    
+    if(isNewCond) {
+        text += "※新品・未開封品ですが、あくまでも二次流通品となります。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。";
+    } else {
+        text += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
+    }
 
     const out = document.getElementById('output-area');
     out.innerText = text; out.style.display = 'block';
