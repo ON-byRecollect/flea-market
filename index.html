@@ -26,7 +26,16 @@
             max-width: 600px; margin: 0 auto; background: white; padding: 24px 20px; 
             border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); 
         }
-        h1 { font-size: 1.1rem; text-align: center; margin-bottom: 24px; font-weight: 700; }
+        h1 { font-size: 1.1rem; text-align: center; margin-bottom: 12px; font-weight: 700; }
+        
+        /* リセットボタンのスタイル */
+        .btn-reset { 
+            background: var(--error); color: white; width: 100%; padding: 14px; 
+            border: none; border-radius: 14px; font-size: 0.9rem; font-weight: 700; 
+            cursor: pointer; margin-bottom: 24px; transition: transform 0.1s;
+        }
+        .btn-reset:active { transform: scale(0.98); opacity: 0.9; }
+
         .section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #eff0f6; }
         .hidden { display: none !important; }
         label { display: block; font-weight: 700; margin-bottom: 12px; font-size: 0.9rem; color: #4a4a4e; }
@@ -53,7 +62,7 @@
 
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         
-        button { 
+        button.btn-copy { 
             font-family: var(--font-main); width: 100%; padding: 18px; border: none; border-radius: 14px; 
             font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s;
             margin-bottom: 12px;
@@ -83,7 +92,6 @@
         .count-over { color: var(--error); font-weight: 700; }
         .required { color: var(--error); margin-left: 4px; }
 
-        /* 自動消滅ポップアップ（トースト）用スタイル */
         #toast {
             position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.8); color: white; padding: 12px 24px;
@@ -97,6 +105,8 @@
 
 <div class="container">
     <h1>商品登録</h1>
+    
+    <button class="btn-reset" onclick="resetAll()">すべてをリセット</button>
 
     <div class="section">
         <label>商品名 <span class="required">*</span></label>
@@ -183,14 +193,14 @@
     <div id="output-wrapper" class="output-wrapper hidden">
         <span class="output-label">タイトル</span>
         <div id="output-title" class="output-box"></div>
-        <button class="btn-copy-title" onclick="processCopy('title')">タイトルをコピー</button>
+        <button class="btn-copy btn-copy-title" onclick="processCopy('title')">タイトルをコピー</button>
         <div id="title-char-count" class="char-count">タイトル: 0/65</div>
 
         <span class="output-label">本文</span>
         <div id="output-body" class="output-box"></div>
         <div id="body-char-count" class="char-count">本文: 0/1000</div>
         
-        <button class="btn-copy-body" onclick="processCopy('body')">本文をコピー</button>
+        <button class="btn-copy btn-copy-body" onclick="processCopy('body')">本文をコピー</button>
     </div>
 </div>
 
@@ -228,6 +238,23 @@ function init() {
 function resetAndFillUI() {
     ['chargingMethod', 'spec', 'size', 'color'].forEach(id => document.getElementById(id).innerHTML = '<option value="">選択してください</option>');
     updateUI();
+}
+
+// すべてをリセットする関数
+function resetAll() {
+    if (!confirm('入力内容をすべて消去しますか？')) return;
+    document.getElementById('productId').value = "";
+    resetAndFillUI();
+    const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
+    accCheckboxes.forEach(cb => { cb.checked = false; cb.disabled = false; });
+    ['appearanceNotes', 'battery', 'bandColor'].forEach(id => document.getElementById(id).value = "");
+    ['condition', 'warranty', 'shippingRank', 'bandSize', 'bandCondition', 'netRestriction'].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+    ['detailA', 'detailB', 'detailC'].forEach(id => document.getElementById(id).innerHTML = "");
+    updateUI();
+    autoGenerate(); // バリデーション失敗によりプレビューを隠す
+    showToast("リセットしました");
 }
 
 function updateUI() {
@@ -306,20 +333,13 @@ function validateInputs() {
 
 function showToast(message) {
     const toast = document.getElementById('toast');
-    toast.innerText = message;
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 1000); // 1秒で消滅
+    toast.innerText = message; toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, 1000);
 }
 
 function autoGenerate() {
-    if(!validateInputs()) {
-        document.getElementById('output-wrapper').classList.add('hidden');
-        return;
-    }
+    if(!validateInputs()) { document.getElementById('output-wrapper').classList.add('hidden'); return; }
     const pid = document.getElementById('productId').value; const cond = document.getElementById('condition').value; const ship = document.getElementById('shippingRank').value; const p = PRODUCTS[pid]; const charging = document.getElementById('chargingMethod').value; const spec = document.getElementById('spec').value; const size = document.getElementById('size').value; const color = document.getElementById('color').value; const kw = getKeywords(pid, spec, charging, color); const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value); const isNewBundle = checkedAccs.includes("新品同梱品と同じ"); const isNewCond = cond === "未開封の「新品／未使用」状態";
-    
     const titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
     let bodyText = titleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n・本体\n";
     if(isNewBundle) bodyText = bodyText.replace("・本体\n", ""); checkedAccs.forEach(a => bodyText += `・${a}\n`); if(!isNewBundle) bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
@@ -327,7 +347,7 @@ function autoGenerate() {
     if(!isNewCond) { 
         if(["9", "10"].includes(pid)) bodyText += "新品未開封の状態です。\n"; 
         else { bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`; if(pid !== "12") bodyText += `${document.getElementById('detailC').value}\n`; } 
-        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; 
+        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } 
         bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
     }
     const bVal = document.getElementById('battery').value; let batteryLine = ""; let hasNotesText = false;
@@ -341,11 +361,9 @@ function autoGenerate() {
     if(checkedAccs.includes("充電ケーブル（テスト用）")) bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
     if(isNewCond) bodyText += "※新品・未開封品ですが、あくまでも二次流通品となります。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。"; 
     else bodyText += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
-
     document.getElementById('output-wrapper').classList.remove('hidden');
     document.getElementById('output-title').innerText = titleLine;
     document.getElementById('output-body').innerText = bodyText;
-    
     const updateCount = (id, current, max, label) => {
         const el = document.getElementById(id);
         const countSpan = `<span class="${current > max ? 'count-over' : ''}">${current}</span>`;
