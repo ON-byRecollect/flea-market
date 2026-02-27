@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フリマ商品説明作成ツール v6</title>
+    <style>
+        :root { --primary-color: #007AFF; --bg-color: #f2f2f7; }
+        body { font-family: -apple-system, sans-serif; background-color: var(--bg-color); padding: 20px; color: #1c1c1e; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 1.1rem; text-align: center; margin-bottom: 20px; color: #333; }
+        .section { margin-bottom: 18px; border-bottom: 1px solid #e5e5ea; padding-bottom: 15px; }
+        .hidden { display: none; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.85rem; color: #555; }
+        select, input { width: 100%; padding: 12px; border: 1px solid #c7c7cc; border-radius: 8px; font-size: 1rem; box-sizing: border-box; margin-bottom: 10px; }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .checkbox-item { display: flex; align-items: center; font-size: 0.8rem; }
+        .checkbox-item input { width: 18px; height: 18px; margin-right: 5px; margin-bottom: 0; }
+        button { width: 100%; padding: 16px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        #output-area { margin-top: 20px; padding: 10px; background: #f9f9f9; border: 1px dashed #ccc; font-size: 0.8rem; white-space: pre-wrap; display: none; }
+        .required-mark { color: red; margin-left: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>フリマ商品説明作成 v6</h1>
+
+    <div class="section">
+        <label>商品名<span class="required-mark">*</span></label>
+        <select id="productName" onchange="updateUI()">
+            <option value="">選択してください</option>
+            <option value="1">Apple Watch SE 第2世代</option>
+            <option value="2">Apple Watch SE 第3世代</option>
+            <option value="3">Apple Watch Series 10</option>
+            <option value="4">Apple Watch Series 11</option>
+            <option value="5">Apple AirPods 4</option>
+            <option value="6">Apple AirPods 4 ANC</option>
+            <option value="7">Apple AirPods Pro 第2世代</option>
+            <option value="8">Apple AirPods Pro 第3世代</option>
+            <option value="9">Apple Pencil 第1世代</option>
+            <option value="10">Apple Pencil 第2世代</option>
+            <option value="11">Apple HomePod mini</option>
+            <option value="12">Apple Magic Trackpad 3</option>
+        </select>
+    </div>
+
+    <div class="section">
+        <div id="wrapperSpec">
+            <label>スペック</label>
+            <select id="spec">
+                <option value="">選択なし</option>
+                <option value="Lightning">Lightning</option>
+                <option value="USB-C">USB-C</option>
+                <option value="GPS Cellular">GPS Cellular</option>
+                <option value="GPS">GPS</option>
+            </select>
+        </div>
+        <div id="wrapperSize">
+            <label>サイズ</label>
+            <select id="size"></select>
+        </div>
+        <div id="wrapperColor">
+            <label>カラー</label>
+            <select id="color"></select>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>同梱物 (複数可)</label>
+        <div class="checkbox-group" id="accessories">
+            <div class="checkbox-item"><input type="checkbox" value="未使用バンド（互換品）"> 未使用バンド</div>
+            <div class="checkbox-item"><input type="checkbox" value="スポーツバンド（アップル純正）"> 純正バンド</div>
+            <div class="checkbox-item"><input type="checkbox" value="充電ケーブル（テスト用）"> 充電(テスト)</div>
+            <div class="checkbox-item"><input type="checkbox" value="充電ケーブル（アップル純正）"> 充電(純正)</div>
+            <div class="checkbox-item"><input type="checkbox" value="イヤーチップ"> チップ</div>
+            <div class="checkbox-item"><input type="checkbox" value="ACアダプター"> ACアダプタ</div>
+            <div class="checkbox-item"><input type="checkbox" value="新品同梱品と同じ"> 新品同様同梱</div>
+            <div class="checkbox-item"><input type="checkbox" value="外箱"> 外箱</div>
+            <div class="checkbox-item"><input type="checkbox" value="外箱／リーフレット"> 箱/説明書</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>外観状態<span class="required-mark">*</span></label>
+        <select id="visualState">
+            <option value="■使用感が少ない「未使用に近い」状態">未使用に近い</option>
+            <option value="■目立つ傷、スレがない「とても良好」な状態">とても良好</option>
+            <option value="■小傷、微スレありますが「致命傷のない」状態">致命傷なし</option>
+            <option value="■傷、スレありますが「十分に使用可能」な状態">使用可能</option>
+        </select>
+        
+        <div id="dynamicDetails">
+            <div id="boxA"><label>詳細A<span class="required-mark">*</span></label><select id="detailA"></select></div>
+            <div id="boxB"><label>詳細B<span class="required-mark">*</span></label><select id="detailB"></select></div>
+            <div id="boxC"><label>詳細C<span class="required-mark">*</span></label><select id="detailC"></select></div>
+            <div id="fixedText" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>バッテリー最大容量 (%)</label>
+        <input type="number" id="battery" placeholder="例: 95">
+        <label>保証 (任意)</label>
+        <select id="warranty">
+            <option value="">選択なし</option>
+            <option value="■Apple Care Service">Apple Care Service</option>
+            <option value="■AppleCare+">AppleCare+</option>
+            <option value="■Apple製品限定保証">Apple製品限定保証</option>
+        </select>
+        <div id="wrapperNetLimit">
+            <label>ネットワーク利用制限</label>
+            <select id="networkLimit"><option value="-">-</option><option value="○">○</option></select>
+        </div>
+    </div>
+
+    <div class="section">
+        <label>配送ランク<span class="required-mark">*</span></label>
+        <select id="shipping">
+            <option value="A">（A）ゆうパケット / 宅急便コン(+350)</option>
+            <option value="B">（B）宅急便コンパクト（無料）</option>
+            <option value="C">（C）宅急便（無料）</option>
+        </select>
+    </div>
+
+    <button onclick="generateAndCopy()">確定（コピーする）</button>
+    <div id="output-area"></div>
+</div>
+
+<script>
+// データ定義は省略なしで全維持
+const optionsData = {
+    colors: {
+        watch12: ["ミッドナイト", "スターライト", "シルバー"],
+        watch34: ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"],
+        homepod: ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"]
+    },
+    details: {
+        watch: {
+            A: ["画面は肉眼でわかる傷、スレ、割れはありません。", "画面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"],
+            B: ["側面は肉眼でわかる傷、スレ、剥げはありません。", "側面は微細な剥げがありますが、目立つ傷はありません。", "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"],
+            C: ["背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", "背面に微細な剥げがありますが、装着時には気にならない箇所です。", "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"]
+        },
+        audio: {
+            A: ["ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"],
+            B: ["ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", "ケース内側は、やや使用感がありますが使用に問題はありません。"],
+            C: ["イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"]
+        },
+        homepod: {
+            A: ["パネル面は肉眼でわかる傷、スレ、割れはありません。", "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"],
+            B: ["側面は肉眼でわかる傷、スレ、割れはありません。", "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "側面は浅めの傷やスレがありますが、使用に影響はありません。"],
+            C: ["底面は肉眼でわかる傷、スレ、割れはありません。", "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "底面は浅めの傷やスレがありますが、使用に影響はありません。"]
+        },
+        trackpad: {
+            A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"],
+            B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ、ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"]
+        }
+    }
+};
+
+function updateUI() {
+    const pid = parseInt(document.getElementById('productName').value);
+    const wrapperSpec = document.getElementById('wrapperSpec');
+    const wrapperSize = document.getElementById('wrapperSize');
+    const wrapperColor = document.getElementById('wrapperColor');
+    const sizeSel = document.getElementById('size');
+    const colorSel = document.getElementById('color');
+    const batteryInput = document.getElementById('battery');
+    const shipSel = document.getElementById('shipping');
+
+    [wrapperSpec, wrapperSize, wrapperColor].forEach(w => w.classList.add('hidden'));
+    sizeSel.innerHTML = '<option value="">選択なし</option>';
+    colorSel.innerHTML = '<option value="">選択なし</option>';
+    batteryInput.disabled = false;
+    document.getElementById('fixedText').classList.add('hidden');
+    ['boxA','boxB','boxC'].forEach(b => document.getElementById(b).classList.remove('hidden'));
+
+    if (!pid) return;
+    if (pid === 7) wrapperSpec.classList.remove('hidden');
+
+    if (pid <= 2) {
+        wrapperSize.classList.remove('hidden'); wrapperColor.classList.remove('hidden');
+        setOptions(sizeSel, ["40mm", "44mm"]); setOptions(colorSel, optionsData.colors.watch12);
+        setDetailOptions(optionsData.details.watch);
+    } else if (pid <= 4) {
+        wrapperSize.classList.remove('hidden'); wrapperColor.classList.remove('hidden');
+        setOptions(sizeSel, ["42mm", "46mm"]); setOptions(colorSel, optionsData.colors.watch34);
+        setDetailOptions(optionsData.details.watch);
+    } else if (pid <= 8) {
+        setDetailOptions(optionsData.details.audio);
+    } else if (pid <= 10) {
+        batteryInput.disabled = true;
+        ['boxA','boxB','boxC'].forEach(b => document.getElementById(b).classList.add('hidden'));
+        document.getElementById('fixedText').classList.remove('hidden'); document.getElementById('fixedText').innerText = "新品未開封の状態です。";
+    } else if (pid === 11) {
+        wrapperColor.classList.remove('hidden'); setOptions(colorSel, optionsData.colors.homepod);
+        shipSel.value = "C"; batteryInput.disabled = true; setDetailOptions(optionsData.details.homepod);
+    } else if (pid === 12) {
+        document.getElementById('boxC').classList.add('hidden'); setDetailOptions(optionsData.details.trackpad);
+    }
+}
+
+function setOptions(el, arr) { arr.forEach(v => { const o = document.createElement('option'); o.value = v; o.text = v; el.appendChild(o); }); }
+function setDetailOptions(group) {
+    ['A', 'B', 'C'].forEach(s => {
+        const el = document.getElementById('detail' + s);
+        el.innerHTML = '<option value="">-- 選択してください --</option>';
+        if (group[s]) group[s].forEach(v => { const o = document.createElement('option'); o.value = v; o.text = v; el.appendChild(o); });
+    });
+}
+
+function generateAndCopy() {
+    const pid = parseInt(document.getElementById('productName').value);
+    if (!pid) { alert("商品名を選択してください"); return; }
+    if (pid !== 9 && pid !== 10) {
+        if (!document.getElementById('detailA').value || !document.getElementById('detailB').value) { alert("詳細AとBは必須です"); return; }
+        if (pid !== 12 && !document.getElementById('detailC').value) { alert("詳細Cは必須です"); return; }
+    }
+
+    const pName = document.getElementById('productName').options[document.getElementById('productName').selectedIndex].text;
+    const spec = document.getElementById('spec').value;
+    const size = document.getElementById('size').value;
+    const color = document.getElementById('color').value;
+    const visual = document.getElementById('visualState').value;
+    const battery = document.getElementById('battery').value;
+    const warranty = document.getElementById('warranty').value;
+    const shipping = document.getElementById('shipping').value;
+    const netLimit = document.getElementById('networkLimit').value;
+
+    let accs = [];
+    let isNewSame = false;
+    document.querySelectorAll('#accessories input:checked').forEach(i => {
+        accs.push(i.value);
+        if (i.value === "新品同梱品と同じ") isNewSame = true;
+    });
+
+    // テキスト組み立て
+    let res = `${pName} ${spec} ${size} ${color}\n`.replace(/\s+/g, ' ').trim() + "\n";
+    res += `━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n\n【同梱物】\n・本体\n`;
+    accs.forEach(a => res += `・${a}\n`);
+    
+    // 同梱物末尾の条件分岐（新品同梱品と同じ が無い場合のみ表示）
+    if (!isNewSame) {
+        res += `\n※未記載の物（外箱・説明書等）は発送できません。\n`;
+    }
+    res += `\n【外観状態】\n${visual}\n`;
+    
+    if (pid === 9 || pid === 10) res += `新品未開封の状態です。\n`;
+    else {
+        res += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`;
+        if (pid !== 12) res += `${document.getElementById('detailC').value}\n`;
+    }
+    res += `※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n■動作不良・機能不具合等は、ありません。\n\n`;
+
+    if (battery >= 51) res += `・バッテリー最大容量は${battery}％です。\n\n`;
+    else if (battery !== "" && battery <= 50) {
+        const t = (pid >= 5 && pid <= 8) ? "音楽再生" : "接続";
+        res += `・バッテリーは10分間の${t}で約${battery}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
+    }
+
+    if (pid === 12) res += `・本体のリセット済み\n\n`;
+    if (pid >= 5 && pid <= 8) res += `・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n\n`;
+    if (pid >= 1 && pid <= 4) res += `・本体の初期化、アクティベーションロック解除済み\n\n`;
+    if (pid === 11) res += `・本体の初期化、アカウント連携解除済み\n\n`;
+
+    if (warranty) {
+        res += `${warranty}\n`;
+        if (warranty.includes("Service")) res += `（AppleCare+の通信キャリア版で保証内容は同等）\n\n`;
+        else if (warranty.includes("+")) res += `（故障・盗難・紛失時に割安でサポート対応）\n\n`;
+        else res += `（自然故障なら無料で修理してもらえる保証）\n\n`;
+    }
+
+    if (spec === "GPS Cellular") {
+        res += `■ネットワーク利用制限「${netLimit || '-'}」\n${(netLimit === "○") ? "（国内キャリア版で残債／利用制限なし）" : "（Apple直販の国内版で利用制限なし）"}\n\n`;
+    }
+
+    res += `━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n`;
+    
+    if (shipping === "A") res += `■ゆうパケット（送料無料）\n・日時指定／コンビニ受取（不可）\n・置き配（不可）\n\n■宅急便コンパクト（+350円）\n・日時指定／コンビニ受取（可）\n・置き配（可）\n\n`;
+    else if (shipping === "B") res += `■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）\n※変更を希望される場合は、購入前にご申告ください。\n\n`;
+    else if (shipping === "C") res += `■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）\n\n`;
+
+    if (isNewSame) {
+        res += `※新品・未開封品ですが、あくまでも二次流通品となります。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。`;
+    } else {
+        res += `※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。`;
+    }
+
+    const area = document.getElementById('output-area');
+    area.innerText = res; area.style.display = 'block';
+    navigator.clipboard.writeText(res).then(() => { alert("コピーしました！"); }).catch(() => { alert("手動でコピーしてください"); });
+}
+</script>
+</body>
+</html>
