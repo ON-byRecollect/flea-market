@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>商品説明ジェネレーター v10.1</title>
+    <title>商品登録 v11.2</title>
     <link rel="stylesheet" href="https://static.line-scdn.net/lineseed-jp/edge/fonts.css">
     <style>
         :root { 
@@ -33,30 +33,34 @@
         }
         select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
         
-        /* 改善されたチェックボックスのデザイン */
-        .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+        .checkbox-group { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+        }
         .checkbox-item { 
-            display: flex; align-items: center; padding: 16px; 
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            padding: 14px 8px; min-height: 60px;
             background: #fff; border: 1.5px solid var(--border-color); border-radius: 12px;
             transition: all 0.2s ease; cursor: pointer;
         }
+        .checkbox-item input { display: none; }
         .checkbox-item:has(input:checked) {
             border-color: var(--accent); background: #f0f7ff;
         }
-        .checkbox-item input { 
-            width: 24px; height: 24px; margin-right: 12px; accent-color: var(--accent);
-            flex-shrink: 0;
+        .checkbox-item:has(input:checked) .checkbox-label {
+            color: var(--accent); font-weight: 700;
         }
-        .checkbox-label { font-size: 0.95rem; font-weight: 500; color: #1c1c1e; }
-        .checkbox-item input:disabled + .checkbox-label { color: #8e8e93; }
+        .checkbox-label { font-size: 0.8rem; font-weight: 500; color: #1c1c1e; pointer-events: none; }
+        .checkbox-item:has(input:disabled) { background: #f2f2f7; opacity: 0.6; cursor: default; }
 
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         button { 
             font-family: var(--font-main); width: 100%; padding: 18px; background: var(--primary); 
             color: white; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700; 
-            cursor: pointer; margin-top: 10px; transition: transform 0.1s;
+            cursor: pointer; margin-top: 10px;
         }
-        button:active { transform: scale(0.98); }
+        button:active { transform: scale(0.98); opacity: 0.9; }
         #output-area { 
             margin-top: 24px; padding: 18px; background: #2c2c2e; color: #f5f5f7; 
             font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; border-radius: 14px; display: none; 
@@ -67,7 +71,7 @@
 <body>
 
 <div class="container">
-    <h1>商品説明ジェネレーター v10.1</h1>
+    <h1>商品登録</h1>
 
     <div class="section">
         <label>商品名 <span class="required">*</span></label>
@@ -98,7 +102,7 @@
     </div>
 
     <div class="section">
-        <label>同梱物</label>
+        <label>同梱物 <span class="required">*</span></label>
         <div id="accessoriesGroup" class="checkbox-group"></div>
         <div id="bandDetails" class="sub-panel hidden">
             <label>バンドサイズ <span class="required">*</span></label>
@@ -172,47 +176,20 @@
 <script>
 // データ定義
 const PRODUCTS = {
-  "1": { name: "Apple Watch SE 第2世代", cat: "watch" },
-  "2": { name: "Apple Watch SE 第3世代", cat: "watch" },
-  "3": { name: "Apple Watch Series 10", cat: "watch" },
-  "4": { name: "Apple Watch Series 11", cat: "watch" },
-  "5": { name: "Apple AirPods 4", cat: "airpods" },
-  "6": { name: "Apple AirPods 4 ANC", cat: "airpods" },
-  "7": { name: "Apple AirPods Pro 第2世代", cat: "airpods" },
-  "8": { name: "Apple AirPods Pro 第3世代", cat: "airpods" },
-  "9": { name: "Apple Pencil 第1世代", cat: "pencil" },
-  "10": { name: "Apple Pencil 第2世代", cat: "pencil" },
-  "11": { name: "Apple HomePod mini", cat: "homepod" },
-  "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" },
+  "1": { name: "Apple Watch SE 第2世代", cat: "watch" }, "2": { name: "Apple Watch SE 第3世代", cat: "watch" }, "3": { name: "Apple Watch Series 10", cat: "watch" }, "4": { name: "Apple Watch Series 11", cat: "watch" }, "5": { name: "Apple AirPods 4", cat: "airpods" }, "6": { name: "Apple AirPods 4 ANC", cat: "airpods" }, "7": { name: "Apple AirPods Pro 第2世代", cat: "airpods" }, "8": { name: "Apple AirPods Pro 第3世代", cat: "airpods" }, "9": { name: "Apple Pencil 第1世代", cat: "pencil" }, "10": { name: "Apple Pencil 第2世代", cat: "pencil" }, "11": { name: "Apple HomePod mini", cat: "homepod" }, "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" },
 };
-
 const MASTER = {
-    specs: { "1": ["GPS Cellular", "GPS"], "2": ["GPS Cellular", "GPS"], "3": ["GPS Cellular", "GPS"], "4": ["GPS Cellular", "GPS"], "7": ["Lightning", "USB-C"] },
-    charging: { "12": ["Lightning", "USB-C"] },
-    sizes: { "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] },
-    colors: {
-        "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"],
-        "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"], "12": ["ホワイト", "ブラック"]
-    },
-    shipping: {
-        "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" },
-        "B": { label: "B - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" },
-        "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }
-    },
+    specs: { "1": ["GPS Cellular", "GPS"], "2": ["GPS Cellular", "GPS"], "3": ["GPS Cellular", "GPS"], "4": ["GPS Cellular", "GPS"], "7": ["Lightning", "USB-C"] }, charging: { "12": ["Lightning", "USB-C"] }, sizes: { "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] },
+    colors: { "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"], "12": ["ホワイト", "ブラック"] },
+    shipping: { "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" }, "B": { label: "B - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }, "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" } },
     accs: ["未使用バンド（互換品）", "スポーツバンド（アップル純正）", "充電ケーブル（テスト用）", "充電ケーブル（アップル純正）", "イヤーチップ", "ACアダプター", "新品同梱品と同じ", "外箱", "外箱／リーフレット"],
-    details: {
-        watch: { A: ["画面は肉眼でわかる傷、スレ、割れはありません。", "画面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、剥げはありません。", "側面は微細な剥げがありますが、目立つ傷はありません。", "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"], C: ["背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", "背面に微細な剥げがありますが、装着時には気にならない箇所です。", "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"] },
-        audio: { A: ["ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"], B: ["ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", "ケース内側は、やや使用感がありますが使用に問題はありません。"], C: ["イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"] },
-        homepod: { A: ["パネル面は肉眼でわかる傷、スレ、割れはありません。", "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、割れはありません。", "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "側面は浅めの傷やスレがありますが、使用に影響はありません。"], C: ["底面は肉眼でわかる傷、スレ、割れはありません。", "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "底面は浅めの傷やスレがありますが、使用に影響はありません。"] },
-        trackpad: { A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"], B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ,ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"] }
-    }
+    details: { watch: { A: ["画面は肉眼でわかる傷、スレ、割れはありません。", "画面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、剥げはありません。", "側面は微細な剥げがありますが、目立つ傷はありません。", "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"], C: ["背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", "背面に微細な剥げがありますが、装着時には気にならない箇所です。", "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"] }, audio: { A: ["ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"], B: ["ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", "ケース内側は、やや使用感がありますが使用に問題はありません。"], C: ["イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"] }, homepod: { A: ["パネル面は肉眼でわかる傷、スレ、割れはありません。", "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"], B: ["側面は肉眼でわかる傷、スレ、割れはありません。", "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "側面は浅めの傷やスレがありますが、使用に影響はありません。"], C: ["底面は肉眼でわかる傷、スレ、割れはありません。", "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", "底面は浅めの傷やスレがありますが、使用に影響はありません。"] }, trackpad: { A: ["トラックパッド操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", "トラックパッド操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", "トラックパッド操作面は細かい傷やスレがありますが、操作性には影響ありません。"], B: ["トラックパッド底面は肉眼でわかる傷、スレ、汚れ,ゴムの劣化がほとんどありません。", "トラックパッド底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめで操作性に影響はありません。", "トラックパッド底面はやや使用感がありスレ等はあり、ゴムも少々劣化していますが、操作性に影響はありません。"] } }
 };
 
 function init() {
     const pSel = document.getElementById('productId');
     pSel.innerHTML = '<option value="">選択してください</option>';
     Object.entries(PRODUCTS).forEach(([id, p]) => pSel.innerHTML += `<option value="${id}">${p.name}</option>`);
-    
     const accGroup = document.getElementById('accessoriesGroup');
     accGroup.innerHTML = '';
     MASTER.accs.forEach(a => {
@@ -221,59 +198,40 @@ function init() {
         label.innerHTML = `<input type="checkbox" value="${a}" onchange="updateUI()"><span class="checkbox-label">${a}</span>`;
         accGroup.appendChild(label);
     });
-    
     const sRank = document.getElementById('shippingRank');
     sRank.innerHTML = '<option value="">選択してください</option>';
     Object.entries(MASTER.shipping).forEach(([id, r]) => sRank.innerHTML += `<option value="${id}">${r.label}</option>`);
 }
 
 function resetAndFillUI() {
-    ['chargingMethod', 'spec', 'size', 'color'].forEach(id => {
-        document.getElementById(id).innerHTML = '<option value="">選択してください</option>';
-    });
+    ['chargingMethod', 'spec', 'size', 'color'].forEach(id => document.getElementById(id).innerHTML = '<option value="">選択してください</option>');
     updateUI();
 }
 
 function updateUI() {
     const pid = document.getElementById('productId').value;
     const condSelect = document.getElementById('condition');
-    const condValue = condSelect.value;
     const spec = document.getElementById('spec').value;
-    const isUnopened = condValue === "未開封の「新品／未使用」状態";
+    const isUnopened = condSelect.value === "未開封の「新品／未使用」状態";
     if(!pid) return;
 
     const toggle = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
-    toggle('wrapperCharging', MASTER.charging[pid]);
-    toggle('wrapperSpec', MASTER.specs[pid]);
-    toggle('wrapperSize', MASTER.sizes[pid]);
-    toggle('wrapperColor', MASTER.colors[pid]);
-    toggle('wrapperNet', spec === "GPS Cellular");
-    toggle('wrapperBattery', pid !== "11");
+    toggle('wrapperCharging', MASTER.charging[pid]); toggle('wrapperSpec', MASTER.specs[pid]); toggle('wrapperSize', MASTER.sizes[pid]); toggle('wrapperColor', MASTER.colors[pid]); toggle('wrapperNet', spec === "GPS Cellular"); toggle('wrapperBattery', pid !== "11");
 
-    fillSelectOnce('chargingMethod', MASTER.charging[pid]);
-    fillSelectOnce('spec', MASTER.specs[pid]);
-    fillSelectOnce('size', MASTER.sizes[pid]);
-    fillSelectOnce('color', MASTER.colors[pid]);
+    fillSelectOnce('chargingMethod', MASTER.charging[pid]); fillSelectOnce('spec', MASTER.specs[pid]); fillSelectOnce('size', MASTER.sizes[pid]); fillSelectOnce('color', MASTER.colors[pid]);
     document.getElementById('batteryLabel').innerHTML = (["5", "6", "7", "8", "12"].includes(pid) ? "10分間の消費バッテリー（%）" : "バッテリー最大容量（%）") + ' <span class="required">*</span>';
     
     const isPencil = ["9", "10"].includes(pid);
     const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
-    
     if (isPencil) {
-        condSelect.value = "未開封の「新品／未使用」状態";
-        condSelect.disabled = true;
-        accCheckboxes.forEach(cb => {
-            cb.checked = (cb.value === "新品同梱品と同じ");
-            cb.disabled = true;
-        });
+        condSelect.value = "未開封の「新品／未使用」状態"; condSelect.disabled = true;
+        accCheckboxes.forEach(cb => { cb.checked = (cb.value === "新品同梱品と同じ"); cb.disabled = true; });
         toggle('appearancePanel', false);
     } else {
-        condSelect.disabled = false;
-        accCheckboxes.forEach(cb => cb.disabled = false);
+        condSelect.disabled = false; accCheckboxes.forEach(cb => cb.disabled = false);
         toggle('appearancePanel', pid && !isUnopened);
         if(pid && !isUnopened) {
-            const type = PRODUCTS[pid].cat;
-            const boxC = document.getElementById('boxC');
+            const type = PRODUCTS[pid].cat; const boxC = document.getElementById('boxC');
             if(pid === "12") boxC.classList.add('hidden'); else boxC.classList.remove('hidden');
             ['boxA','boxB'].forEach(id => document.getElementById(id).classList.remove('hidden'));
             const group = MASTER.details[type === "pencil" ? "audio" : (type === "watch" ? "watch" : (type === "airpods" ? "audio" : type))];
@@ -285,21 +243,17 @@ function updateUI() {
 }
 
 function fillSelectOnce(id, arr) {
-    const el = document.getElementById(id);
-    if(!arr || el.options.length > 1) return;
+    const el = document.getElementById(id); if(!arr || el.options.length > 1) return;
     arr.forEach(v => el.innerHTML += `<option value="${v}">${v}</option>`);
 }
 
 function fillDetail(suffix, arr) {
-    const el = document.getElementById('detail' + suffix);
-    if(!arr || el.options.length > 1) return;
-    el.innerHTML = '<option value="">-- 選択してください --</option>';
-    arr.forEach(v => el.innerHTML += `<option value="${v}">${v}</option>`);
+    const el = document.getElementById('detail' + suffix); if(!arr || el.options.length > 1) return;
+    el.innerHTML = '<option value="">-- 選択してください --</option>'; arr.forEach(v => el.innerHTML += `<option value="${v}">${v}</option>`);
 }
 
 function getKeywords(pid, spec, charging, color) {
-    const p = PRODUCTS[pid]; if (!p) return "";
-    const name = p.name; const c2 = spec || charging; const e2 = color;
+    const p = PRODUCTS[pid]; if (!p) return ""; const name = p.name; const c2 = spec || charging; const e2 = color;
     if (name === "Apple AirPods Pro 第2世代" && c2 === "Lightning") return "MQD83J/A エアポッツプロ AirPodsPro2";
     if (name === "Apple AirPods Pro 第2世代" && c2 === "USB-C") return "MTJV3J/A エアポッツプロ AirPodsPro2";
     if (name === "Apple AirPods Pro 第3世代") return "MFHP4J/A エアポッツプロ AirPodsPro3";
@@ -317,115 +271,40 @@ function getKeywords(pid, spec, charging, color) {
 }
 
 function validateInputs() {
-    const pid = document.getElementById('productId').value;
-    if(!pid) return "商品名を選択してください。";
+    const pid = document.getElementById('productId').value; if(!pid) return "商品名を選択してください。";
     if(!document.getElementById('wrapperCharging').classList.contains('hidden') && !document.getElementById('chargingMethod').value) return "充電方式を選択してください。";
     if(!document.getElementById('wrapperSpec').classList.contains('hidden') && !document.getElementById('spec').value) return "スペックを選択してください。";
     if(!document.getElementById('wrapperSize').classList.contains('hidden') && !document.getElementById('size').value) return "サイズを選択してください。";
     if(!document.getElementById('wrapperColor').classList.contains('hidden') && !document.getElementById('color').value) return "カラーを選択してください。";
-    if(!document.getElementById('bandDetails').classList.contains('hidden')) {
-        if(!document.getElementById('bandSize').value) return "バンドサイズを選択してください。";
-        if(!document.getElementById('bandCondition').value) return "バンド状態を選択してください。";
-    }
-    const cond = document.getElementById('condition').value;
-    if(!cond) return "外観状態を選択してください。";
-    if(!document.getElementById('appearancePanel').classList.contains('hidden')) {
-        if(!document.getElementById('detailA').value) return "外観詳細Aを選択してください。";
-        if(!document.getElementById('detailB').value) return "外観詳細Bを選択してください。";
-        if(!document.getElementById('boxC').classList.contains('hidden') && !document.getElementById('detailC').value) return "外観詳細Cを選択してください。";
-    }
+    if(Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).length === 0) return "同梱物を最低ひとつ選択してください。";
+    if(!document.getElementById('bandDetails').classList.contains('hidden')) { if(!document.getElementById('bandSize').value) return "バンドサイズを選択してください。"; if(!document.getElementById('bandCondition').value) return "バンド状態を選択してください。"; }
+    const cond = document.getElementById('condition').value; if(!cond) return "外観状態を選択してください。";
+    if(!document.getElementById('appearancePanel').classList.contains('hidden')) { if(!document.getElementById('detailA').value) return "外観詳細Aを選択してください。"; if(!document.getElementById('detailB').value) return "外観詳細Bを選択してください。"; if(!document.getElementById('boxC').classList.contains('hidden') && !document.getElementById('detailC').value) return "外観詳細Cを選択してください。"; }
     if(!document.getElementById('wrapperBattery').classList.contains('hidden') && !document.getElementById('battery').value) return "バッテリー最大容量（または消費量）を入力してください。";
     if(!document.getElementById('wrapperNet').classList.contains('hidden') && !document.getElementById('netRestriction').value) return "ネットワーク利用制限を選択してください。";
-    const ship = document.getElementById('shippingRank').value;
-    if(!ship) return "配送ランクを選択してください。";
+    if(!document.getElementById('shippingRank').value) return "配送ランクを選択してください。";
     return null;
 }
 
 function generate() {
-    const errorMsg = validateInputs();
-    if(errorMsg) return alert(errorMsg);
-    const pid = document.getElementById('productId').value;
-    const cond = document.getElementById('condition').value;
-    const ship = document.getElementById('shippingRank').value;
-    const p = PRODUCTS[pid];
-    const charging = document.getElementById('chargingMethod').value;
-    const spec = document.getElementById('spec').value;
-    const size = document.getElementById('size').value;
-    const color = document.getElementById('color').value;
-    const kw = getKeywords(pid, spec, charging, color);
-    const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value);
-    const isNewBundle = checkedAccs.includes("新品同梱品と同じ");
-    const isNewCond = cond === "未開封の「新品／未使用」状態";
-
+    const errorMsg = validateInputs(); if(errorMsg) return alert(errorMsg);
+    const pid = document.getElementById('productId').value; const cond = document.getElementById('condition').value; const ship = document.getElementById('shippingRank').value; const p = PRODUCTS[pid]; const charging = document.getElementById('chargingMethod').value; const spec = document.getElementById('spec').value; const size = document.getElementById('size').value; const color = document.getElementById('color').value; const kw = getKeywords(pid, spec, charging, color); const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value); const isNewBundle = checkedAccs.includes("新品同梱品と同じ"); const isNewCond = cond === "未開封の「新品／未使用」状態";
     let text = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim() + "\n";
-    text += "\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n";
-    text += "【同梱物】\n・本体\n";
-    if(isNewBundle) text = text.replace("・本体\n", "");
-    checkedAccs.forEach(a => text += `・${a}\n`);
-    if(!isNewBundle) text += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
+    text += "\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n・本体\n";
+    if(isNewBundle) text = text.replace("・本体\n", ""); checkedAccs.forEach(a => text += `・${a}\n`); if(!isNewBundle) text += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
     text += `\n【外観状態】\n■${cond}\n`;
-    if(!isNewCond) {
-        if(["9", "10"].includes(pid)) text += "新品未開封の状態です。\n";
-        else {
-            text += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`;
-            if(pid !== "12") text += `${document.getElementById('detailC').value}\n`;
-        }
-        const notes = document.getElementById('appearanceNotes').value;
-        if(notes) text += `${notes}\n`;
-        if (checkedAccs.includes("スポーツバンド（アップル純正）")) {
-            const bSize = document.getElementById('bandSize').value;
-            const bColor = document.getElementById('bandColor').value;
-            const bCond = document.getElementById('bandCondition').value;
-            if (bSize && bCond) text += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`;
-        }
-        text += "\n※簡易清掃を行なった上で、撮影を行なっています。\n画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は,ありません。\n";
-    }
-    const bVal = document.getElementById('battery').value;
-    let batteryLine = "";
-    let hasNotesText = false;
-    if(pid !== "11" && bVal) {
-        const bNum = parseInt(bVal);
-        if(["5", "6", "7", "8"].includes(pid)) {
-            batteryLine = `・バッテリーは、10分の音楽再生で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
-            hasNotesText = true;
-        } else if(pid === "12") {
-            batteryLine = `・バッテリーは、10分の接続で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
-            hasNotesText = true;
-        } else { batteryLine = `・バッテリー最大容量は「${bNum}%」です。\n`; }
-    }
-    if (hasNotesText) batteryLine += "\n";
-    text += batteryLine;
-    let initLine = "";
-    if (!isNewBundle) {
-        const name = p.name;
-        if (["Apple AirPods 4 ANC", "Apple AirPods 4", "Apple AirPods Pro 第2世代", "Apple AirPods Pro 第3世代"].includes(name)) initLine = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
-        else if (["Apple Watch SE 第2世代", "Apple Watch SE 第3世代", "Apple Watch Series 10", "Apple Watch Series 11"].includes(name)) initLine = "・本体の初期化、アクティベーションロック解除済み\n";
-        else if (name === "Apple HomePod mini") initLine = "・本体の初期化、アカウント連携解除済み\n";
-        else if (["Apple Magic Trackpad 3 (Multi-Touch対応)", "Apple Pencil 第1世代", "Apple Pencil 第2世代"].includes(name)) initLine = "・本体のリセット済み\n";
-    }
+    if(!isNewCond) { if(["9", "10"].includes(pid)) text += "新品未開封の状態です。\n"; else { text += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`; if(pid !== "12") text += `${document.getElementById('detailC').value}\n`; } const notes = document.getElementById('appearanceNotes').value; if(notes) text += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) text += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } text += "\n※簡易清掃を行なった上で、撮影を行なっています。\n画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は,ありません。\n"; }
+    const bVal = document.getElementById('battery').value; let batteryLine = ""; let hasNotesText = false;
+    if(pid !== "11" && bVal) { const bNum = parseInt(bVal); if(["5", "6", "7", "8"].includes(pid)) { batteryLine = `・バッテリーは、10分の音楽再生で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`; hasNotesText = true; } else if(pid === "12") { batteryLine = `・バッテリーは、10分の接続で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`; hasNotesText = true; } else { batteryLine = `・バッテリー最大容量は「${bNum}%」です。\n`; } }
+    if (hasNotesText) batteryLine += "\n"; text += batteryLine;
+    let initLine = ""; if (!isNewBundle) { const name = p.name; if (["Apple AirPods 4 ANC", "Apple AirPods 4", "Apple AirPods Pro 第2世代", "Apple AirPods Pro 第3世代"].includes(name)) initLine = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n"; else if (["Apple Watch SE 第2世代", "Apple Watch SE 第3世代", "Apple Watch Series 10", "Apple Watch Series 11"].includes(name)) initLine = "・本体の初期化、アクティベーションロック解除済み\n"; else if (name === "Apple HomePod mini") initLine = "・本体の初期化、アカウント連携解除済み\n"; else if (["Apple Magic Trackpad 3 (Multi-Touch対応)", "Apple Pencil 第1世代", "Apple Pencil 第2世代"].includes(name)) initLine = "・本体のリセット済み\n"; }
     text += initLine;
-    if (spec === "GPS Cellular") {
-        const net = document.getElementById('netRestriction').value;
-        if (net) {
-            text += `\n■ネットワーク利用制限「${net}」\n`;
-            text += (net === "○") ? "（国内キャリア版で残債／利用制限ありません）\n" : "（Apple直販の国内版で利用制限はかかっていません）\n";
-        }
-    }
-    const warranty = document.getElementById('warranty').value;
-    if(warranty) {
-        text += `\n■${warranty}\n`;
-        const wMsg = (warranty === "Apple Care Service") ? "（AppleCare+の通信キャリア版で保証内容は同等です）" : (warranty === "AppleCare+" ? "（故障・盗難・紛失時に割安でサポート対応）" : "（Appleの保証サービス）");
-        text += `${wMsg}\n`;
-    }
-    text += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n";
-    text += "・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n";
-    text += MASTER.shipping[ship].text + "\n\n";
+    if (spec === "GPS Cellular") { const net = document.getElementById('netRestriction').value; if (net) { text += `\n■ネットワーク利用制限「${net}」\n`; text += (net === "○") ? "（国内キャリア版で残債／利用制限ありません）\n" : "（Apple直販の国内版で利用制限はかかっていません）\n"; } }
+    const warranty = document.getElementById('warranty').value; if(warranty) { text += `\n■${warranty}\n`; const wMsg = (warranty === "Apple Care Service") ? "（AppleCare+の通信キャリア版で保証内容は同等です）" : (warranty === "AppleCare+" ? "（故障・盗難・紛失時に割安でサポート対応）" : "（Appleの保証サービス）"); text += `${wMsg}\n`; }
+    text += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n" + MASTER.shipping[ship].text + "\n\n";
     if(checkedAccs.includes("充電ケーブル（テスト用）")) text += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
-    if(isNewCond) text += "※新品・未開封品ですが、あくまでも二次流通品となります。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。";
-    else text += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
-    const out = document.getElementById('output-area');
-    out.innerText = text; out.style.display = 'block';
-    navigator.clipboard.writeText(text).then(() => alert("コピーしました！"));
+    if(isNewCond) text += "※新品・未開封品ですが、あくまでも二次流通品となります。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。"; else text += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
+    const out = document.getElementById('output-area'); out.innerText = text; out.style.display = 'block'; navigator.clipboard.writeText(text).then(() => alert("コピーしました！"));
 }
 init();
 </script>
