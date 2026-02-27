@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>フリマ商品説明作成ツール v9.5</title>
+    <title>フリマ商品説明作成ツール v10.0</title>
     <link rel="stylesheet" href="https://static.line-scdn.net/lineseed-jp/edge/fonts.css">
     <style>
         :root { 
@@ -51,7 +51,7 @@
 <body>
 
 <div class="container">
-    <h1>商品説明ジェネレーター v9.5</h1>
+    <h1>商品説明ジェネレーター v10.0</h1>
 
     <div class="section">
         <label>商品名 <span class="required">*</span></label>
@@ -60,23 +60,23 @@
 
     <div class="section">
         <div id="wrapperCharging" class="hidden">
-            <label>充電方式</label>
+            <label>充電方式 <span class="required">*</span></label>
             <select id="chargingMethod" onchange="updateUI()">
-                <option value="">選択なし</option>
+                <option value="">選択してください</option>
                 <option value="Lightning">Lightning</option>
                 <option value="USB-C">USB-C</option>
             </select>
         </div>
         <div id="wrapperSpec" class="hidden">
-            <label>スペック</label>
+            <label>スペック <span class="required">*</span></label>
             <select id="spec" onchange="updateUI()"></select>
         </div>
         <div id="wrapperSize" class="hidden">
-            <label>サイズ</label>
+            <label>サイズ <span class="required">*</span></label>
             <select id="size"></select>
         </div>
         <div id="wrapperColor" class="hidden">
-            <label>カラー</label>
+            <label>カラー <span class="required">*</span></label>
             <select id="color" onchange="updateUI()"></select>
         </div>
     </div>
@@ -85,7 +85,7 @@
         <label>同梱物 (複数選択)</label>
         <div id="accessoriesGroup" class="checkbox-group"></div>
         <div id="bandDetails" class="sub-panel hidden">
-            <label>バンドサイズ</label>
+            <label>バンドサイズ <span class="required">*</span></label>
             <select id="bandSize">
                 <option value="">選択してください</option>
                 <option value="S／M">S／M</option>
@@ -93,7 +93,7 @@
             </select>
             <label>バンドカラー</label>
             <input type="text" id="bandColor" placeholder="例：ミッドナイト">
-            <label>バンド状態</label>
+            <label>バンド状態 <span class="required">*</span></label>
             <select id="bandCondition">
                 <option value="">選択してください</option>
                 <option value="使用感がほとんどない未使用に近いものです。">未使用に近い</option>
@@ -114,9 +114,9 @@
             <option value="■傷、スレありますが「十分に使用可能」な状態">使用可能</option>
         </select>
         <div id="appearancePanel">
-            <div id="boxA"><label id="labelA">詳細A</label><select id="detailA"></select></div>
-            <div id="boxB"><label id="labelB">詳細B</label><select id="detailB"></select></div>
-            <div id="boxC"><label id="labelC">詳細C</label><select id="detailC"></select></div>
+            <div id="boxA"><label id="labelA">詳細A <span class="required">*</span></label><select id="detailA"></select></div>
+            <div id="boxB"><label id="labelB">詳細B <span class="required">*</span></label><select id="detailB"></select></div>
+            <div id="boxC"><label id="labelC">詳細C <span class="required">*</span></label><select id="detailC"></select></div>
         </div>
         <label style="margin-top:10px;">外観備考 (任意)</label>
         <input type="text" id="appearanceNotes" placeholder="例：液晶保護フィルム貼付済み">
@@ -124,7 +124,7 @@
 
     <div class="section">
         <div id="wrapperBattery">
-            <label id="batteryLabel">バッテリー最大容量 (%)</label>
+            <label id="batteryLabel">バッテリー最大容量 (%) <span class="required">*</span></label>
             <input type="number" id="battery" placeholder="0-100">
         </div>
         <label>保証 (任意)</label>
@@ -135,7 +135,7 @@
             <option value="Apple製品限定保証">Apple製品限定保証</option>
         </select>
         <div id="wrapperNet" class="hidden">
-            <label>ネットワーク利用制限</label>
+            <label>ネットワーク利用制限 <span class="required">*</span></label>
             <select id="netRestriction">
                 <option value="">選択してください</option>
                 <option value="-">-</option>
@@ -205,7 +205,7 @@ function init() {
 
 function resetAndFillUI() {
     ['chargingMethod', 'spec', 'size', 'color'].forEach(id => {
-        document.getElementById(id).innerHTML = '<option value="">選択なし</option>';
+        document.getElementById(id).innerHTML = '<option value="">選択してください</option>';
     });
     updateUI();
 }
@@ -230,7 +230,7 @@ function updateUI() {
     fillSelectOnce('spec', MASTER.specs[pid]);
     fillSelectOnce('size', MASTER.sizes[pid]);
     fillSelectOnce('color', MASTER.colors[pid]);
-    document.getElementById('batteryLabel').innerText = ["5", "6", "7", "8", "12"].includes(pid) ? "10分間の消費バッテリー（%）" : "バッテリー最大容量（%）";
+    document.getElementById('batteryLabel').innerHTML = (["5", "6", "7", "8", "12"].includes(pid) ? "10分間の消費バッテリー（%）" : "バッテリー最大容量（%）") + ' <span class="required">*</span>';
     
     const isPencil = ["9", "10"].includes(pid);
     const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
@@ -292,11 +292,54 @@ function getKeywords(pid, spec, charging, color) {
     return "";
 }
 
+// バリデーション関数
+function validateInputs() {
+    const pid = document.getElementById('productId').value;
+    if(!pid) return "商品名を選択してください。";
+
+    // 表示されているスペック等のチェック
+    if(!document.getElementById('wrapperCharging').classList.contains('hidden') && !document.getElementById('chargingMethod').value) return "充電方式を選択してください。";
+    if(!document.getElementById('wrapperSpec').classList.contains('hidden') && !document.getElementById('spec').value) return "スペックを選択してください。";
+    if(!document.getElementById('wrapperSize').classList.contains('hidden') && !document.getElementById('size').value) return "サイズを選択してください。";
+    if(!document.getElementById('wrapperColor').classList.contains('hidden') && !document.getElementById('color').value) return "カラーを選択してください。";
+
+    // バンド詳細
+    if(!document.getElementById('bandDetails').classList.contains('hidden')) {
+        if(!document.getElementById('bandSize').value) return "バンドサイズを選択してください。";
+        if(!document.getElementById('bandCondition').value) return "バンド状態を選択してください。";
+    }
+
+    const cond = document.getElementById('condition').value;
+    if(!cond) return "外観状態を選択してください。";
+
+    // 外観詳細（中古の場合のみ）
+    if(!document.getElementById('appearancePanel').classList.contains('hidden')) {
+        if(!document.getElementById('detailA').value) return "外観詳細Aを選択してください。";
+        if(!document.getElementById('detailB').value) return "外観詳細Bを選択してください。";
+        if(!document.getElementById('boxC').classList.contains('hidden') && !document.getElementById('detailC').value) return "外観詳細Cを選択してください。";
+    }
+
+    // バッテリー（HomePod mini以外）
+    if(!document.getElementById('wrapperBattery').classList.contains('hidden') && !document.getElementById('battery').value) return "バッテリー最大容量（または消費量）を入力してください。";
+
+    // ネットワーク制限（表示時のみ）
+    if(!document.getElementById('wrapperNet').classList.contains('hidden') && !document.getElementById('netRestriction').value) return "ネットワーク利用制限を選択してください。";
+
+    const ship = document.getElementById('shippingRank').value;
+    if(!ship) return "配送ランクを選択してください。";
+
+    return null; // OK
+}
+
 function generate() {
+    // バリデーション実行
+    const errorMsg = validateInputs();
+    if(errorMsg) return alert(errorMsg);
+
     const pid = document.getElementById('productId').value;
     const cond = document.getElementById('condition').value;
     const ship = document.getElementById('shippingRank').value;
-    if(!pid || !cond || !ship) return alert("必須項目を入力してください");
+    
     const p = PRODUCTS[pid];
     const charging = document.getElementById('chargingMethod').value;
     const spec = document.getElementById('spec').value;
@@ -332,12 +375,9 @@ function generate() {
         text += "\n※簡易清掃を行なった上で、撮影を行なっています。\n画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は,ありません。\n";
     }
 
-    // =====================================
-    // バッテリー情報と注釈のロジック (v9.5 修正点)
-    // =====================================
     const bVal = document.getElementById('battery').value;
     let batteryLine = "";
-    let hasNotesText = false; // 「※製品仕様上...」の注釈があるかフラグ
+    let hasNotesText = false;
 
     if(pid !== "11" && bVal) {
         const bNum = parseInt(bVal);
@@ -349,29 +389,18 @@ function generate() {
             hasNotesText = true;
         } else {
             batteryLine = `・バッテリー最大容量は「${bNum}%」です。\n`;
-            hasNotesText = false;
         }
     }
-    
-    // 注釈テキストがある場合のみ、次の行との間に空行を入れる
-    if (hasNotesText) {
-        batteryLine += "\n";
-    }
+    if (hasNotesText) batteryLine += "\n";
     text += batteryLine;
 
-    // 初期化ロジック
     let initLine = "";
     if (!isNewBundle) {
         const name = p.name;
-        if (["Apple AirPods 4 ANC", "Apple AirPods 4", "Apple AirPods Pro 第2世代", "Apple AirPods Pro 第3世代"].includes(name)) {
-            initLine = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
-        } else if (["Apple Watch SE 第2世代", "Apple Watch SE 第3世代", "Apple Watch Series 10", "Apple Watch Series 11"].includes(name)) {
-            initLine = "・本体の初期化、アクティベーションロック解除済み\n";
-        } else if (name === "Apple HomePod mini") {
-            initLine = "・本体の初期化、アカウント連携解除済み\n";
-        } else if (["Apple Magic Trackpad 3 (Multi-Touch対応)", "Apple Pencil 第1世代", "Apple Pencil 第2世代"].includes(name)) {
-            initLine = "・本体のリセット済み\n";
-        }
+        if (["Apple AirPods 4 ANC", "Apple AirPods 4", "Apple AirPods Pro 第2世代", "Apple AirPods Pro 第3世代"].includes(name)) initLine = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
+        else if (["Apple Watch SE 第2世代", "Apple Watch SE 第3世代", "Apple Watch Series 10", "Apple Watch Series 11"].includes(name)) initLine = "・本体の初期化、アクティベーションロック解除済み\n";
+        else if (name === "Apple HomePod mini") initLine = "・本体の初期化、アカウント連携解除済み\n";
+        else if (["Apple Magic Trackpad 3 (Multi-Touch対応)", "Apple Pencil 第1世代", "Apple Pencil 第2世代"].includes(name)) initLine = "・本体のリセット済み\n";
     }
     text += initLine;
 
