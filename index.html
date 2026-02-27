@@ -72,14 +72,9 @@
             border: 1.5px solid var(--border-color); margin-bottom: 8px;
             word-break: break-all; width: 100%; box-sizing: border-box;
         }
-        
-        /* 本文プレビュー：正確な25文字折り返し（content-box化により解決） */
         #output-body { 
-            font-size: 13px;
-            width: 325px; /* 13px * 25文字 = 325px 固定 */
-            box-sizing: content-box; /* パディングを外に出すことで正確な25文字幅を確保 */
-            max-width: calc(100% - 32px); /* 画面サイズに配慮 */
-            padding: 16px; margin-bottom: 8px; 
+            font-size: 13px; width: 325px; box-sizing: content-box; 
+            max-width: calc(100% - 32px); padding: 16px; margin-bottom: 8px; 
             display: block; margin-left: auto; margin-right: auto;
         }
 
@@ -87,6 +82,15 @@
         .char-count { width: 100%; text-align: right; font-size: 0.75rem; color: #8e8e93; font-weight: 500; margin-bottom: 12px; }
         .count-over { color: var(--error); font-weight: 700; }
         .required { color: var(--error); margin-left: 4px; }
+
+        /* 自動消滅ポップアップ（トースト）用スタイル */
+        #toast {
+            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8); color: white; padding: 12px 24px;
+            border-radius: 25px; font-size: 0.9rem; font-weight: 700;
+            z-index: 9999; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        #toast.show { opacity: 1; }
     </style>
 </head>
 <body>
@@ -189,6 +193,8 @@
         <button class="btn-copy-body" onclick="processCopy('body')">本文をコピー</button>
     </div>
 </div>
+
+<div id="toast"></div>
 
 <script>
 // マスターデータ
@@ -298,6 +304,15 @@ function validateInputs() {
     return true;
 }
 
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.innerText = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 1000); // 1秒で消滅
+}
+
 function autoGenerate() {
     if(!validateInputs()) {
         document.getElementById('output-wrapper').classList.add('hidden');
@@ -320,11 +335,8 @@ function autoGenerate() {
     if (hasNotesText) batteryLine += "\n"; bodyText += batteryLine;
     let initLine = ""; if (!isNewBundle) { const name = p.name; if (["Apple AirPods 4 ANC", "Apple AirPods 4", "Apple AirPods Pro 第2世代", "Apple AirPods Pro 第3世代"].includes(name)) initLine = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n"; else if (["Apple Watch SE 第2世代", "Apple Watch SE 第3世代", "Apple Watch Series 10", "Apple Watch Series 11"].includes(name)) initLine = "・本体の初期化、アクティベーションロック解除済み\n"; else if (name === "Apple HomePod mini") initLine = "・本体の初期化、アカウント連携解除済み\n"; else if (["Apple Magic Trackpad 3 (Multi-Touch対応)", "Apple Pencil 第1世代", "Apple Pencil 第2世代"].includes(name)) initLine = "・本体のリセット済み\n"; }
     bodyText += initLine;
-    
-    // バグ修正：bodyTextへの連結ミスを修正
     if (spec === "GPS Cellular") { const net = document.getElementById('netRestriction').value; if (net) { bodyText += `\n■ネットワーク利用制限「${net}」\n`; bodyText += (net === "○") ? "（国内キャリア版で残債／利用制限ありません）\n" : "（Apple直販の国内版で利用制限はかかっていません）\n"; } }
     const warranty = document.getElementById('warranty').value; if(warranty) { bodyText += `\n■${warranty}\n`; const wMsg = (warranty === "Apple Care Service") ? "（AppleCare+の通信キャリア版で保証内容は同等です）" : (warranty === "AppleCare+" ? "（故障・盗難・紛失時に割安でサポート対応）" : "（Appleの保証サービス）"); bodyText += `${wMsg}\n`; }
-    
     bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n" + MASTER.shipping[ship].text + "\n\n";
     if(checkedAccs.includes("充電ケーブル（テスト用）")) bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
     if(isNewCond) bodyText += "※新品・未開封品ですが、あくまでも二次流通品となります。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。"; 
@@ -347,9 +359,9 @@ function processCopy(type) {
     const title = document.getElementById('output-title').innerText;
     const body = document.getElementById('output-body').innerText;
     if (type === 'title') {
-        navigator.clipboard.writeText(title).then(() => alert("タイトルをコピーしました！"));
+        navigator.clipboard.writeText(title).then(() => showToast("タイトルをコピーしました！"));
     } else {
-        navigator.clipboard.writeText(body).then(() => alert("本文をコピーしました！"));
+        navigator.clipboard.writeText(body).then(() => showToast("本文をコピーしました！"));
     }
 }
 init();
