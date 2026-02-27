@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="apple-mobile-web-app-title" content="商品登録">
     <title>商品登録</title>
     
@@ -20,6 +21,9 @@
             --error: #ff3b30;
             --btn-gray: #f2f2f7;
         }
+        /* パスワード認証前は非表示にする */
+        #main-content { display: none; }
+
         body { 
             font-family: var(--font-main);
             background: var(--bg); padding: 10px; color: #1c1c1e; line-height: 1.6;
@@ -38,8 +42,6 @@
             border: none; border-radius: 14px; font-size: 0.9rem; font-weight: 700; 
             cursor: pointer; margin-bottom: 24px; transition: transform 0.1s;
         }
-        .btn-reset:active { transform: scale(0.98); opacity: 0.9; }
-
         .section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #eff0f6; }
         .hidden { display: none !important; }
         label { display: block; font-weight: 700; margin-bottom: 12px; font-size: 0.9rem; color: #4a4a4e; }
@@ -49,7 +51,6 @@
             border-radius: 12px; font-size: 1rem; box-sizing: border-box; margin-bottom: 12px; background: #fff; 
             -webkit-appearance: none; appearance: none;
         }
-        select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
         
         .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .checkbox-item { 
@@ -62,7 +63,6 @@
         .checkbox-item:has(input:checked) { border-color: var(--accent); background: #e5f1ff; }
         .checkbox-item:has(input:checked) .checkbox-label { color: var(--accent); font-weight: 700; }
         .checkbox-label { font-size: 0.75rem; font-weight: 500; color: #1c1c1e; pointer-events: none; line-height: 1.4; }
-        .checkbox-item:has(input:disabled) { background: #e2e2e9; opacity: 0.5; cursor: default; }
 
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         
@@ -73,7 +73,6 @@
         }
         .btn-copy-title { background: #e2e2e9; color: #1c1c1e; }
         .btn-copy-body { background: var(--primary); color: white; margin-top: 10px; }
-        button:active { transform: scale(0.98); opacity: 0.9; }
 
         .output-wrapper { 
             margin-top: 30px; border-top: 2px solid var(--bg); padding-top: 20px;
@@ -107,7 +106,7 @@
 </head>
 <body>
 
-<div class="container">
+<div id="main-content" class="container">
     <h1>商品登録</h1>
     
     <button class="btn-reset" onclick="resetAll()">すべてをリセット</button>
@@ -118,22 +117,10 @@
     </div>
 
     <div class="section">
-        <div id="wrapperCharging" class="hidden">
-            <label>充電方式 <span class="required">*</span></label>
-            <select id="chargingMethod" onchange="autoGenerate()"></select>
-        </div>
-        <div id="wrapperSpec" class="hidden">
-            <label>スペック <span class="required">*</span></label>
-            <select id="spec" onchange="autoGenerate()"></select>
-        </div>
-        <div id="wrapperSize" class="hidden">
-            <label>サイズ <span class="required">*</span></label>
-            <select id="size" onchange="autoGenerate()"></select>
-        </div>
-        <div id="wrapperColor" class="hidden">
-            <label>カラー <span class="required">*</span></label>
-            <select id="color" onchange="updateUI(); autoGenerate();"></select>
-        </div>
+        <div id="wrapperCharging" class="hidden"><label>充電方式 <span class="required">*</span></label><select id="chargingMethod" onchange="autoGenerate()"></select></div>
+        <div id="wrapperSpec" class="hidden"><label>スペック <span class="required">*</span></label><select id="spec" onchange="autoGenerate()"></select></div>
+        <div id="wrapperSize" class="hidden"><label>サイズ <span class="required">*</span></label><select id="size" onchange="autoGenerate()"></select></div>
+        <div id="wrapperColor" class="hidden"><label>カラー <span class="required">*</span></label><select id="color" onchange="updateUI(); autoGenerate();"></select></div>
     </div>
 
     <div class="section">
@@ -144,66 +131,32 @@
             <select id="bandSize" onchange="autoGenerate()"><option value="">選択してください</option><option value="S／M">S／M</option><option value="M／L">M／L</option></select>
             <label>バンドカラー</label><input type="text" id="bandColor" oninput="autoGenerate()" placeholder="例：ミッドナイト">
             <label>バンド状態 <span class="required">*</span></label>
-            <select id="bandCondition" onchange="autoGenerate()">
-                <option value="">選択してください</option>
-                <option value="使用感がほとんどない未使用に近いものです。">未使用に近い</option>
-                <option value="裏面にスレがありますが黄ばみやベタつき、致命傷はありません。">微スレあり・致命傷なし</option>
-                <option value="使用感はありますが、問題なく着用可能です。">使用感あり・着用可能</option>
-            </select>
+            <select id="bandCondition" onchange="autoGenerate()"><option value="">選択してください</option><option value="使用感がほとんどない未使用に近いものです。">未使用に近い</option><option value="裏面にスレがありますが黄ばみやベタつき、致命傷はありません。">微スレあり・致命傷なし</option><option value="使用感はありますが、問題なく着用可能です。">使用感あり・着用可能</option></select>
         </div>
     </div>
 
     <div class="section">
         <label>外観状態 <span class="required">*</span></label>
-        <select id="condition" onchange="updateUI(); autoGenerate();">
-            <option value="">選択してください</option>
-            <option value="未開封の「新品／未使用」状態">新品</option>
-            <option value="使用感が少ない「未使用に近い」状態">未使用に近い</option>
-            <option value="目立つ傷、スレがない「とても良好」な状態">とても良好</option>
-            <option value="小傷、微スレありますが「致命傷のない」状態">致命傷なし</option>
-            <option value="傷、スレありますが「十分に使用可能」な状態">使用可能</option>
-        </select>
-        <div id="appearancePanel">
-            <div id="boxA"><label id="labelA">詳細A <span class="required">*</span></label><select id="detailA" onchange="autoGenerate()"></select></div>
-            <div id="boxB"><label id="labelB">詳細B <span class="required">*</span></label><select id="detailB" onchange="autoGenerate()"></select></div>
-            <div id="boxC"><label id="labelC">詳細C <span class="required">*</span></label><select id="detailC" onchange="autoGenerate()"></select></div>
-        </div>
+        <select id="condition" onchange="updateUI(); autoGenerate();"><option value="">選択してください</option><option value="未開封の「新品／未使用」状態">新品</option><option value="使用感が少ない「未使用に近い」状態">未使用に近い</option><option value="目立つ傷、スレがない「とても良好」な状態">とても良好</option><option value="小傷、微スレありますが「致命傷のない」状態">致命傷なし</option><option value="傷、スレありますが「十分に使用可能」な状態">使用可能</option></select>
+        <div id="appearancePanel"><div id="boxA"><label id="labelA">詳細A <span class="required">*</span></label><select id="detailA" onchange="autoGenerate()"></select></div><div id="boxB"><label id="labelB">詳細B <span class="required">*</span></label><select id="detailB" onchange="autoGenerate()"></select></div><div id="boxC"><label id="labelC">詳細C <span class="required">*</span></label><select id="detailC" onchange="autoGenerate()"></select></div></div>
         <label style="margin-top:10px;">外観備考</label><input type="text" id="appearanceNotes" oninput="autoGenerate()" placeholder="例：液晶保護フィルム貼付済み">
     </div>
 
     <div class="section">
-        <div id="wrapperBattery">
-            <label id="batteryLabel">バッテリー最大容量 (%) <span class="required">*</span></label>
-            <input type="number" id="battery" oninput="autoGenerate()" placeholder="0-100">
-        </div>
-        <label>保証</label>
-        <select id="warranty" onchange="autoGenerate()">
-            <option value="">選択なし</option>
-            <option value="Apple Care Service">Apple Care Service</option>
-            <option value="AppleCare+">AppleCare+</option>
-            <option value="Apple製品限定保証">Apple製品限定保証</option>
-        </select>
-        <div id="wrapperNet" class="hidden">
-            <label>ネットワーク利用制限 <span class="required">*</span></label>
-            <select id="netRestriction" onchange="autoGenerate()"><option value="">選択してください</option><option value="-">-</option><option value="○">○</option></select>
-        </div>
+        <div id="wrapperBattery"><label id="batteryLabel">バッテリー最大容量 (%) <span class="required">*</span></label><input type="number" id="battery" oninput="autoGenerate()" placeholder="0-100"></div>
+        <label>保証</label><select id="warranty" onchange="autoGenerate()"><option value="">選択なし</option><option value="Apple Care Service">Apple Care Service</option><option value="AppleCare+">AppleCare+</option><option value="Apple製品限定保証">Apple製品限定保証</option></select>
+        <div id="wrapperNet" class="hidden"><label>ネットワーク利用制限 <span class="required">*</span></label><select id="netRestriction" onchange="autoGenerate()"><option value="">選択してください</option><option value="-">-</option><option value="○">○</option></select></div>
     </div>
-
-    <div class="section">
-        <label>配送ランク <span class="required">*</span></label>
-        <select id="shippingRank" onchange="autoGenerate()"></select>
-    </div>
+    <div class="section"><label>配送ランク <span class="required">*</span></label><select id="shippingRank" onchange="autoGenerate()"></select></div>
 
     <div id="output-wrapper" class="output-wrapper hidden">
         <span class="output-label">タイトル</span>
         <div id="output-title" class="output-box"></div>
         <button class="btn-copy btn-copy-title" onclick="processCopy('title')">タイトルをコピー</button>
         <div id="title-char-count" class="char-count">タイトル: 0/65</div>
-
         <span class="output-label">本文</span>
         <div id="output-body" class="output-box"></div>
         <div id="body-char-count" class="char-count">本文: 0/1000</div>
-        
         <button class="btn-copy btn-copy-body" onclick="processCopy('body')">本文をコピー</button>
     </div>
 </div>
@@ -211,7 +164,19 @@
 <div id="toast"></div>
 
 <script>
-// マスターデータ
+// パスワード認証（簡易版）
+const PASS = "0000"; // ここを好きな4桁などに変更してください
+function checkAuth() {
+    const input = prompt("パスワードを入力してください");
+    if (input === PASS) {
+        document.getElementById('main-content').style.display = 'block';
+        init();
+    } else {
+        alert("パスワードが違います");
+        location.reload();
+    }
+}
+
 const PRODUCTS = { "1": { name: "Apple Watch SE 第2世代", cat: "watch" }, "2": { name: "Apple Watch SE 第3世代", cat: "watch" }, "3": { name: "Apple Watch Series 10", cat: "watch" }, "4": { name: "Apple Watch Series 11", cat: "watch" }, "5": { name: "Apple AirPods 4", cat: "airpods" }, "6": { name: "Apple AirPods 4 ANC", cat: "airpods" }, "7": { name: "Apple AirPods Pro 第2世代", cat: "airpods" }, "8": { name: "Apple AirPods Pro 第3世代", cat: "airpods" }, "9": { name: "Apple Pencil 第1世代", cat: "pencil" }, "10": { name: "Apple Pencil 第2世代", cat: "pencil" }, "11": { name: "Apple HomePod mini", cat: "homepod" }, "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" } };
 const MASTER = {
     specs: { "1": ["GPS", "GPS Cellular"], "2": ["GPS", "GPS Cellular"], "3": ["GPS", "GPS Cellular"], "4": ["GPS", "GPS Cellular"], "7": ["Lightning", "USB-C"] }, charging: { "12": ["Lightning", "USB-C"] }, sizes: { "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] },
@@ -250,13 +215,9 @@ function resetAll() {
     const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
     accCheckboxes.forEach(cb => { cb.checked = false; cb.disabled = false; });
     ['appearanceNotes', 'battery', 'bandColor'].forEach(id => document.getElementById(id).value = "");
-    ['condition', 'warranty', 'shippingRank', 'bandSize', 'bandCondition', 'netRestriction'].forEach(id => {
-        document.getElementById(id).value = "";
-    });
+    ['condition', 'warranty', 'shippingRank', 'bandSize', 'bandCondition', 'netRestriction'].forEach(id => { document.getElementById(id).value = ""; });
     ['detailA', 'detailB', 'detailC'].forEach(id => document.getElementById(id).innerHTML = "");
-    updateUI();
-    autoGenerate(); 
-    showToast("リセットしました");
+    updateUI(); autoGenerate(); showToast("リセットしました");
 }
 
 function updateUI() {
@@ -349,7 +310,7 @@ function autoGenerate() {
     if(!isNewCond) { 
         if(["9", "10"].includes(pid)) bodyText += "新品未開封の状態です。\n"; 
         else { bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n`; if(pid !== "12") bodyText += `${document.getElementById('detailC').value}\n`; } 
-        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } 
+        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; 
         bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
     }
     const bVal = document.getElementById('battery').value; let batteryLine = ""; let hasNotesText = false;
@@ -385,7 +346,9 @@ function processCopy(type) {
         navigator.clipboard.writeText(body).then(() => showToast("本文をコピーしました"));
     }
 }
-init();
+
+// 認証開始
+checkAuth();
 </script>
 </body>
 </html>
