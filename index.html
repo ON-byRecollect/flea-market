@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>フリマ商品説明作成ツール v10.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>商品説明ジェネレーター v10.1</title>
     <link rel="stylesheet" href="https://static.line-scdn.net/lineseed-jp/edge/fonts.css">
     <style>
         :root { 
@@ -11,6 +11,7 @@
             --accent: #007AFF; 
             --bg: #f5f5f7; 
             --font-main: 'LINE Seed JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            --border-color: #e2e2e9;
         }
         body { 
             font-family: var(--font-main);
@@ -24,34 +25,49 @@
         h1 { font-size: 1.1rem; text-align: center; margin-bottom: 24px; font-weight: 700; }
         .section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #eff0f6; }
         .hidden { display: none !important; }
-        label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.85rem; color: #4a4a4e; }
+        label { display: block; font-weight: 700; margin-bottom: 12px; font-size: 0.9rem; color: #4a4a4e; }
         select, input { 
-            font-family: var(--font-main); width: 100%; padding: 14px; border: 1.5px solid #e2e2e9; 
+            font-family: var(--font-main); width: 100%; padding: 14px; border: 1.5px solid var(--border-color); 
             border-radius: 12px; font-size: 1rem; box-sizing: border-box; margin-bottom: 12px; background: #fff; 
+            -webkit-appearance: none; appearance: none;
         }
         select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
-        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .checkbox-item { display: flex; align-items: center; font-size: 0.85rem; background: #f8f8fc; padding: 10px; border-radius: 10px; }
-        .checkbox-item input { width: 22px; height: 22px; margin-right: 10px; accent-color: var(--accent); }
-        .checkbox-item input:disabled { opacity: 0.5; }
-        .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; }
+        
+        /* 改善されたチェックボックスのデザイン */
+        .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+        .checkbox-item { 
+            display: flex; align-items: center; padding: 16px; 
+            background: #fff; border: 1.5px solid var(--border-color); border-radius: 12px;
+            transition: all 0.2s ease; cursor: pointer;
+        }
+        .checkbox-item:has(input:checked) {
+            border-color: var(--accent); background: #f0f7ff;
+        }
+        .checkbox-item input { 
+            width: 24px; height: 24px; margin-right: 12px; accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+        .checkbox-label { font-size: 0.95rem; font-weight: 500; color: #1c1c1e; }
+        .checkbox-item input:disabled + .checkbox-label { color: #8e8e93; }
+
+        .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         button { 
             font-family: var(--font-main); width: 100%; padding: 18px; background: var(--primary); 
             color: white; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700; 
-            cursor: pointer; margin-top: 10px;
+            cursor: pointer; margin-top: 10px; transition: transform 0.1s;
         }
-        button:active { transform: scale(0.97); }
+        button:active { transform: scale(0.98); }
         #output-area { 
             margin-top: 24px; padding: 18px; background: #2c2c2e; color: #f5f5f7; 
             font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; border-radius: 14px; display: none; 
         }
-        .required { color: #ff3b30; margin-left: 3px; }
+        .required { color: #ff3b30; margin-left: 4px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>商品説明ジェネレーター v10.0</h1>
+    <h1>商品説明ジェネレーター v10.1</h1>
 
     <div class="section">
         <label>商品名 <span class="required">*</span></label>
@@ -82,7 +98,7 @@
     </div>
 
     <div class="section">
-        <label>同梱物 (複数選択)</label>
+        <label>同梱物</label>
         <div id="accessoriesGroup" class="checkbox-group"></div>
         <div id="bandDetails" class="sub-panel hidden">
             <label>バンドサイズ <span class="required">*</span></label>
@@ -118,7 +134,7 @@
             <div id="boxB"><label id="labelB">詳細B <span class="required">*</span></label><select id="detailB"></select></div>
             <div id="boxC"><label id="labelC">詳細C <span class="required">*</span></label><select id="detailC"></select></div>
         </div>
-        <label style="margin-top:10px;">外観備考 (任意)</label>
+        <label style="margin-top:10px;">外観備考</label>
         <input type="text" id="appearanceNotes" placeholder="例：液晶保護フィルム貼付済み">
     </div>
 
@@ -127,7 +143,7 @@
             <label id="batteryLabel">バッテリー最大容量 (%) <span class="required">*</span></label>
             <input type="number" id="battery" placeholder="0-100">
         </div>
-        <label>保証 (任意)</label>
+        <label>保証</label>
         <select id="warranty">
             <option value="">選択なし</option>
             <option value="Apple Care Service">Apple Care Service</option>
@@ -154,6 +170,7 @@
 </div>
 
 <script>
+// データ定義
 const PRODUCTS = {
   "1": { name: "Apple Watch SE 第2世代", cat: "watch" },
   "2": { name: "Apple Watch SE 第3世代", cat: "watch" },
@@ -195,9 +212,16 @@ function init() {
     const pSel = document.getElementById('productId');
     pSel.innerHTML = '<option value="">選択してください</option>';
     Object.entries(PRODUCTS).forEach(([id, p]) => pSel.innerHTML += `<option value="${id}">${p.name}</option>`);
+    
     const accGroup = document.getElementById('accessoriesGroup');
     accGroup.innerHTML = '';
-    MASTER.accs.forEach(a => accGroup.innerHTML += `<div class="checkbox-item"><input type="checkbox" value="${a}" onchange="updateUI()"> ${a}</div>`);
+    MASTER.accs.forEach(a => {
+        const label = document.createElement('label');
+        label.className = 'checkbox-item';
+        label.innerHTML = `<input type="checkbox" value="${a}" onchange="updateUI()"><span class="checkbox-label">${a}</span>`;
+        accGroup.appendChild(label);
+    });
+    
     const sRank = document.getElementById('shippingRank');
     sRank.innerHTML = '<option value="">選択してください</option>';
     Object.entries(MASTER.shipping).forEach(([id, r]) => sRank.innerHTML += `<option value="${id}">${r.label}</option>`);
@@ -292,54 +316,37 @@ function getKeywords(pid, spec, charging, color) {
     return "";
 }
 
-// バリデーション関数
 function validateInputs() {
     const pid = document.getElementById('productId').value;
     if(!pid) return "商品名を選択してください。";
-
-    // 表示されているスペック等のチェック
     if(!document.getElementById('wrapperCharging').classList.contains('hidden') && !document.getElementById('chargingMethod').value) return "充電方式を選択してください。";
     if(!document.getElementById('wrapperSpec').classList.contains('hidden') && !document.getElementById('spec').value) return "スペックを選択してください。";
     if(!document.getElementById('wrapperSize').classList.contains('hidden') && !document.getElementById('size').value) return "サイズを選択してください。";
     if(!document.getElementById('wrapperColor').classList.contains('hidden') && !document.getElementById('color').value) return "カラーを選択してください。";
-
-    // バンド詳細
     if(!document.getElementById('bandDetails').classList.contains('hidden')) {
         if(!document.getElementById('bandSize').value) return "バンドサイズを選択してください。";
         if(!document.getElementById('bandCondition').value) return "バンド状態を選択してください。";
     }
-
     const cond = document.getElementById('condition').value;
     if(!cond) return "外観状態を選択してください。";
-
-    // 外観詳細（中古の場合のみ）
     if(!document.getElementById('appearancePanel').classList.contains('hidden')) {
         if(!document.getElementById('detailA').value) return "外観詳細Aを選択してください。";
         if(!document.getElementById('detailB').value) return "外観詳細Bを選択してください。";
         if(!document.getElementById('boxC').classList.contains('hidden') && !document.getElementById('detailC').value) return "外観詳細Cを選択してください。";
     }
-
-    // バッテリー（HomePod mini以外）
     if(!document.getElementById('wrapperBattery').classList.contains('hidden') && !document.getElementById('battery').value) return "バッテリー最大容量（または消費量）を入力してください。";
-
-    // ネットワーク制限（表示時のみ）
     if(!document.getElementById('wrapperNet').classList.contains('hidden') && !document.getElementById('netRestriction').value) return "ネットワーク利用制限を選択してください。";
-
     const ship = document.getElementById('shippingRank').value;
     if(!ship) return "配送ランクを選択してください。";
-
-    return null; // OK
+    return null;
 }
 
 function generate() {
-    // バリデーション実行
     const errorMsg = validateInputs();
     if(errorMsg) return alert(errorMsg);
-
     const pid = document.getElementById('productId').value;
     const cond = document.getElementById('condition').value;
     const ship = document.getElementById('shippingRank').value;
-    
     const p = PRODUCTS[pid];
     const charging = document.getElementById('chargingMethod').value;
     const spec = document.getElementById('spec').value;
@@ -356,7 +363,6 @@ function generate() {
     if(isNewBundle) text = text.replace("・本体\n", "");
     checkedAccs.forEach(a => text += `・${a}\n`);
     if(!isNewBundle) text += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
-
     text += `\n【外観状態】\n■${cond}\n`;
     if(!isNewCond) {
         if(["9", "10"].includes(pid)) text += "新品未開封の状態です。\n";
@@ -374,11 +380,9 @@ function generate() {
         }
         text += "\n※簡易清掃を行なった上で、撮影を行なっています。\n画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は,ありません。\n";
     }
-
     const bVal = document.getElementById('battery').value;
     let batteryLine = "";
     let hasNotesText = false;
-
     if(pid !== "11" && bVal) {
         const bNum = parseInt(bVal);
         if(["5", "6", "7", "8"].includes(pid)) {
@@ -387,13 +391,10 @@ function generate() {
         } else if(pid === "12") {
             batteryLine = `・バッテリーは、10分の接続で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
             hasNotesText = true;
-        } else {
-            batteryLine = `・バッテリー最大容量は「${bNum}%」です。\n`;
-        }
+        } else { batteryLine = `・バッテリー最大容量は「${bNum}%」です。\n`; }
     }
     if (hasNotesText) batteryLine += "\n";
     text += batteryLine;
-
     let initLine = "";
     if (!isNewBundle) {
         const name = p.name;
@@ -403,7 +404,6 @@ function generate() {
         else if (["Apple Magic Trackpad 3 (Multi-Touch対応)", "Apple Pencil 第1世代", "Apple Pencil 第2世代"].includes(name)) initLine = "・本体のリセット済み\n";
     }
     text += initLine;
-
     if (spec === "GPS Cellular") {
         const net = document.getElementById('netRestriction').value;
         if (net) {
@@ -417,18 +417,12 @@ function generate() {
         const wMsg = (warranty === "Apple Care Service") ? "（AppleCare+の通信キャリア版で保証内容は同等です）" : (warranty === "AppleCare+" ? "（故障・盗難・紛失時に割安でサポート対応）" : "（Appleの保証サービス）");
         text += `${wMsg}\n`;
     }
-
     text += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n";
     text += "・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n";
     text += MASTER.shipping[ship].text + "\n\n";
     if(checkedAccs.includes("充電ケーブル（テスト用）")) text += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
-    
-    if(isNewCond) {
-        text += "※新品・未開封品ですが、あくまでも二次流通品となります。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。";
-    } else {
-        text += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
-    }
-
+    if(isNewCond) text += "※新品・未開封品ですが、あくまでも二次流通品となります。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。";
+    else text += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
     const out = document.getElementById('output-area');
     out.innerText = text; out.style.display = 'block';
     navigator.clipboard.writeText(text).then(() => alert("コピーしました！"));
