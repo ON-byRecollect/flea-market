@@ -21,9 +21,6 @@
             --error: #ff3b30;
             --btn-gray: #f2f2f7;
         }
-        /* パスワード認証前は非表示にする */
-        #main-content { display: none; }
-
         body { 
             font-family: var(--font-main);
             background: var(--bg); padding: 10px; color: #1c1c1e; line-height: 1.6;
@@ -37,11 +34,14 @@
         }
         h1 { font-size: 1.1rem; text-align: center; margin-bottom: 12px; font-weight: 700; }
         
+        /* リセットボタン */
         .btn-reset { 
             background: var(--error); color: white; width: 100%; padding: 14px; 
             border: none; border-radius: 14px; font-size: 0.9rem; font-weight: 700; 
             cursor: pointer; margin-bottom: 24px; transition: transform 0.1s;
         }
+        .btn-reset:active { transform: scale(0.98); opacity: 0.9; }
+
         .section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #eff0f6; }
         .hidden { display: none !important; }
         label { display: block; font-weight: 700; margin-bottom: 12px; font-size: 0.9rem; color: #4a4a4e; }
@@ -51,7 +51,9 @@
             border-radius: 12px; font-size: 1rem; box-sizing: border-box; margin-bottom: 12px; background: #fff; 
             -webkit-appearance: none; appearance: none;
         }
+        select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
         
+        /* 同梱物UI */
         .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .checkbox-item { 
             display: flex; align-items: center; justify-content: center; text-align: center;
@@ -63,9 +65,11 @@
         .checkbox-item:has(input:checked) { border-color: var(--accent); background: #e5f1ff; }
         .checkbox-item:has(input:checked) .checkbox-label { color: var(--accent); font-weight: 700; }
         .checkbox-label { font-size: 0.75rem; font-weight: 500; color: #1c1c1e; pointer-events: none; line-height: 1.4; }
+        .checkbox-item:has(input:disabled) { background: #e2e2e9; opacity: 0.5; cursor: default; }
 
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         
+        /* コピーボタン */
         button.btn-copy { 
             font-family: var(--font-main); width: 100%; padding: 18px; border: none; border-radius: 14px; 
             font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s;
@@ -74,6 +78,7 @@
         .btn-copy-title { background: #e2e2e9; color: #1c1c1e; }
         .btn-copy-body { background: var(--primary); color: white; margin-top: 10px; }
 
+        /* プレビュー窓 */
         .output-wrapper { 
             margin-top: 30px; border-top: 2px solid var(--bg); padding-top: 20px;
             display: flex; flex-direction: column; align-items: center; 
@@ -106,9 +111,8 @@
 </head>
 <body>
 
-<div id="main-content" class="container">
+<div class="container">
     <h1>商品登録</h1>
-    
     <button class="btn-reset" onclick="resetAll()">すべてをリセット</button>
 
     <div class="section">
@@ -164,19 +168,7 @@
 <div id="toast"></div>
 
 <script>
-// パスワード認証（簡易版）
-const PASS = "0000"; // ここを好きな4桁などに変更してください
-function checkAuth() {
-    const input = prompt("パスワードを入力してください");
-    if (input === PASS) {
-        document.getElementById('main-content').style.display = 'block';
-        init();
-    } else {
-        alert("パスワードが違います");
-        location.reload();
-    }
-}
-
+// マスターデータ
 const PRODUCTS = { "1": { name: "Apple Watch SE 第2世代", cat: "watch" }, "2": { name: "Apple Watch SE 第3世代", cat: "watch" }, "3": { name: "Apple Watch Series 10", cat: "watch" }, "4": { name: "Apple Watch Series 11", cat: "watch" }, "5": { name: "Apple AirPods 4", cat: "airpods" }, "6": { name: "Apple AirPods 4 ANC", cat: "airpods" }, "7": { name: "Apple AirPods Pro 第2世代", cat: "airpods" }, "8": { name: "Apple AirPods Pro 第3世代", cat: "airpods" }, "9": { name: "Apple Pencil 第1世代", cat: "pencil" }, "10": { name: "Apple Pencil 第2世代", cat: "pencil" }, "11": { name: "Apple HomePod mini", cat: "homepod" }, "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" } };
 const MASTER = {
     specs: { "1": ["GPS", "GPS Cellular"], "2": ["GPS", "GPS Cellular"], "3": ["GPS", "GPS Cellular"], "4": ["GPS", "GPS Cellular"], "7": ["Lightning", "USB-C"] }, charging: { "12": ["Lightning", "USB-C"] }, sizes: { "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] },
@@ -224,7 +216,6 @@ function updateUI() {
     const pid = document.getElementById('productId').value;
     const condSelect = document.getElementById('condition');
     const spec = document.getElementById('spec').value;
-    const isUnopened = condSelect.value === "未開封の「新品／未使用」状態";
     if(!pid) return;
     const toggle = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
     toggle('wrapperCharging', MASTER.charging[pid]); toggle('wrapperSpec', MASTER.specs[pid]); toggle('wrapperSize', MASTER.sizes[pid]); toggle('wrapperColor', MASTER.colors[pid]); toggle('wrapperNet', spec === "GPS Cellular"); toggle('wrapperBattery', pid !== "11");
@@ -238,12 +229,9 @@ function updateUI() {
         toggle('appearancePanel', false);
     } else {
         condSelect.disabled = false; accCheckboxes.forEach(cb => cb.disabled = false);
-        toggle('appearancePanel', pid && !isUnopened);
-        if(pid && !isUnopened) {
-            const type = PRODUCTS[pid].cat; const boxC = document.getElementById('boxC');
-            if(pid === "12") boxC.classList.add('hidden'); else boxC.classList.remove('hidden');
-            ['boxA','boxB'].forEach(id => document.getElementById(id).classList.remove('hidden'));
-            const group = MASTER.details[type === "pencil" ? "audio" : (type === "watch" ? "watch" : (type === "airpods" ? "audio" : type))];
+        toggle('appearancePanel', pid && condSelect.value !== "未開封の「新品／未使用」状態");
+        if(pid && condSelect.value !== "未開封の「新品／未使用」状態") {
+            const group = MASTER.details[PRODUCTS[pid].cat === "pencil" ? "audio" : (PRODUCTS[pid].cat === "watch" ? "watch" : (["5", "6", "7", "8"].includes(pid) ? "audio" : PRODUCTS[pid].cat))];
             if(group) { fillDetail('A', group.A); fillDetail('B', group.B); fillDetail('C', group.C); }
         }
     }
@@ -295,14 +283,14 @@ function validateInputs() {
 }
 
 function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.innerText = message; toast.classList.add('show');
+    const toast = document.getElementById('toast'); toast.innerText = message; toast.classList.add('show');
     setTimeout(() => { toast.classList.remove('show'); }, 1000);
 }
 
 function autoGenerate() {
     if(!validateInputs()) { document.getElementById('output-wrapper').classList.add('hidden'); return; }
     const pid = document.getElementById('productId').value; const cond = document.getElementById('condition').value; const ship = document.getElementById('shippingRank').value; const p = PRODUCTS[pid]; const charging = document.getElementById('chargingMethod').value; const spec = document.getElementById('spec').value; const size = document.getElementById('size').value; const color = document.getElementById('color').value; const kw = getKeywords(pid, spec, charging, color); const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value); const isNewBundle = checkedAccs.includes("新品同梱品と同じ"); const isNewCond = cond === "未開封の「新品／未使用」状態";
+    
     const titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
     let bodyText = titleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n・本体\n";
     if(isNewBundle) bodyText = bodyText.replace("・本体\n", ""); checkedAccs.forEach(a => bodyText += `・${a}\n`); if(!isNewBundle) bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
@@ -321,7 +309,7 @@ function autoGenerate() {
     if (spec === "GPS Cellular") { const net = document.getElementById('netRestriction').value; if (net) { bodyText += `\n■ネットワーク利用制限「${net}」\n`; bodyText += (net === "○") ? "（国内キャリア版で残債／利用制限ありません）\n" : "（Apple直販の国内版で利用制限はかかっていません）\n"; } }
     const warranty = document.getElementById('warranty').value; if(warranty) { bodyText += `\n■${warranty}\n`; const wMsg = (warranty === "Apple Care Service") ? "（AppleCare+の通信キャリア版で保証内容は同等です）" : (warranty === "AppleCare+" ? "（故障・盗難・紛失時に割安でサポート対応）" : "（Appleの保証サービス）"); bodyText += `${wMsg}\n`; }
     bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n" + MASTER.shipping[ship].text + "\n\n";
-    if(checkedAccs.includes("充電ケーブル（テスト用）")) bodyText += "※充電ケーブル（テスト用）は,受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
+    if(checkedAccs.includes("充電ケーブル（テスト用）")) bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
     if(isNewCond) bodyText += "※新品・未開封品ですが、あくまでも二次流通品となります。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。"; 
     else bodyText += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n　価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
 
@@ -346,9 +334,8 @@ function processCopy(type) {
         navigator.clipboard.writeText(body).then(() => showToast("本文をコピーしました"));
     }
 }
-
-// 認証開始
-checkAuth();
+// 即時初期化
+init();
 </script>
 </body>
 </html>
