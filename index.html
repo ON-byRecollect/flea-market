@@ -3,44 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>フリマ商品説明作成ツール v8</title>
+    <title>フリマ商品説明作成ツール v8.3</title>
+    <link rel="stylesheet" href="https://static.line-scdn.net/lineseed-jp/edge/fonts.css">
     <style>
-        :root { --primary: #1c1c1e; --accent: #007AFF; --bg: #f5f5f7; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 10px; color: #333; line-height: 1.4; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h1 { font-size: 1.1rem; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
-        .section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e5e5ea; }
-        .hidden { display: none; }
-        label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.85rem; color: #555; }
-        select, input { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 1rem; box-sizing: border-box; margin-bottom: 12px; background: #fff; appearance: none; }
-        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
-        .checkbox-item { display: flex; align-items: center; font-size: 0.8rem; background: #f2f2f7; padding: 8px; border-radius: 8px; }
-        .checkbox-item input { width: 20px; height: 20px; margin-right: 8px; margin-bottom: 0; }
-        .sub-panel { background: #f9f9fb; padding: 15px; border-radius: 10px; border: 1px solid #e5e5ea; margin-top: 10px; }
-        button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.98); opacity: 0.8; }
-        #output-area { margin-top: 20px; padding: 15px; background: #2c2c2e; color: #fff; font-family: monospace; font-size: 0.75rem; white-space: pre-wrap; border-radius: 10px; display: none; }
-        .required { color: #ff3b30; margin-left: 2px; }
+        :root { 
+            --primary: #1c1c1e; 
+            --accent: #007AFF; 
+            --bg: #f5f5f7; 
+            --font-main: 'LINE Seed JP', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        body { 
+            font-family: var(--font-main);
+            background: var(--bg); 
+            padding: 10px; 
+            color: #1c1c1e; 
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 24px 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04); 
+        }
+        h1 { 
+            font-size: 1.1rem; 
+            text-align: center; 
+            margin-bottom: 24px; 
+            font-weight: 700;
+        }
+        .section { 
+            margin-bottom: 24px; 
+            padding-bottom: 20px; 
+            border-bottom: 1px solid #eff0f6; 
+        }
+        .hidden { display: none !important; }
+        label { 
+            display: block; 
+            font-weight: 700; 
+            margin-bottom: 8px; 
+            font-size: 0.85rem; 
+            color: #4a4a4e; 
+        }
+        select, input { 
+            font-family: var(--font-main);
+            width: 100%; 
+            padding: 14px; 
+            border: 1.5px solid #e2e2e9; 
+            border-radius: 12px; 
+            font-size: 1rem; 
+            box-sizing: border-box; 
+            margin-bottom: 12px; 
+            background: #fff; 
+        }
+        .checkbox-group { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+        }
+        .checkbox-item { 
+            display: flex; 
+            align-items: center; 
+            font-size: 0.85rem; 
+            background: #f8f8fc; 
+            padding: 10px; 
+            border-radius: 10px; 
+        }
+        .checkbox-item input { 
+            width: 22px; 
+            height: 22px; 
+            margin-right: 10px; 
+            accent-color: var(--accent);
+        }
+        .sub-panel { 
+            background: #f4f4f9; 
+            padding: 16px; 
+            border-radius: 12px; 
+            margin-top: 12px; 
+        }
+        button { 
+            font-family: var(--font-main);
+            width: 100%; 
+            padding: 18px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 14px; 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 10px;
+        }
+        button:active { transform: scale(0.97); }
+        #output-area { 
+            margin-top: 24px; 
+            padding: 18px; 
+            background: #2c2c2e; 
+            color: #f5f5f7; 
+            font-family: monospace; 
+            font-size: 0.8rem; 
+            white-space: pre-wrap; 
+            border-radius: 14px; 
+            display: none; 
+        }
+        .required { color: #ff3b30; margin-left: 3px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>商品説明ジェネレーター v8</h1>
+    <h1>商品説明ジェネレーター v8.3</h1>
 
     <div class="section">
         <label>商品名 <span class="required">*</span></label>
-        <select id="productId" onchange="updateUI()"></select>
+        <select id="productId" onchange="resetAndFillUI()"></select>
     </div>
 
     <div class="section">
         <div id="wrapperCharging" class="hidden">
             <label>充電方式</label>
-            <select id="chargingMethod" onchange="updateUI()">
-                <option value="">選択なし</option>
-                <option value="Lightning">Lightning</option>
-                <option value="USB-C">USB-C</option>
-            </select>
+            <select id="chargingMethod" onchange="updateUI()"></select>
         </div>
         <div id="wrapperSpec" class="hidden">
             <label>スペック</label>
@@ -132,7 +216,6 @@
 </div>
 
 <script>
-// Master Data from system-core-code.tsx
 const PRODUCTS = {
   "1": { name: "Apple Watch SE 第2世代", cat: "watch" },
   "2": { name: "Apple Watch SE 第3世代", cat: "watch" },
@@ -149,17 +232,19 @@ const PRODUCTS = {
 };
 
 const MASTER = {
-    specs: { "1": ["GPS Cellular", "GPS"], "2": ["GPS Cellular", "GPS"], "7": ["USB-C", "Lightning"] },
+    specs: { "1": ["GPS Cellular", "GPS"], "2": ["GPS Cellular", "GPS"] },
+    charging: { "7": ["Lightning", "USB-C"], "12": ["Lightning", "USB-C"] },
     sizes: { "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] },
     colors: {
         "1": ["ミッドナイト", "スターライト", "シルバー"],
+        "2": ["ミッドナイト", "スターライト"],
         "3": ["ジェットブラック", "シルバー", "ローズゴールド"],
         "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"],
         "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"],
         "12": ["ブラック", "ホワイト"]
     },
     shipping: {
-        "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・配送補償：あり\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・配送補償：あり\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" },
+        "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" },
         "B": { label: "B - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" },
         "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }
     },
@@ -178,10 +263,24 @@ function init() {
     Object.entries(PRODUCTS).forEach(([id, p]) => pSel.innerHTML += `<option value="${id}">${p.name}</option>`);
 
     const accGroup = document.getElementById('accessoriesGroup');
-    MASTER.accs.forEach(a => accGroup.innerHTML += `<div class="checkbox-item"><input type="checkbox" value="${a}" onchange="updateUI()"> ${a}</div>`);
+    accGroup.innerHTML = '';
+    MASTER.accs.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'checkbox-item';
+        div.innerHTML = `<input type="checkbox" value="${a}" onchange="updateUI()"> ${a}`;
+        accGroup.appendChild(div);
+    });
 
     const sRank = document.getElementById('shippingRank');
+    sRank.innerHTML = '<option value="">選択してください</option>';
     Object.entries(MASTER.shipping).forEach(([id, r]) => sRank.innerHTML += `<option value="${id}">${r.label}</option>`);
+}
+
+function resetAndFillUI() {
+    ['chargingMethod', 'spec', 'size', 'color'].forEach(id => {
+        document.getElementById(id).innerHTML = '<option value="">選択なし</option>';
+    });
+    updateUI();
 }
 
 function updateUI() {
@@ -190,58 +289,58 @@ function updateUI() {
     const spec = document.getElementById('spec').value;
     const isUnopened = cond === "未開封の「新品／未使用」状態";
 
-    // Visibility logic from React Core
-    document.getElementById('wrapperCharging').classList.toggle('hidden', !["7", "12"].includes(pid));
-    document.getElementById('wrapperSpec').classList.toggle('hidden', !MASTER.specs[pid]);
-    document.getElementById('wrapperSize').classList.toggle('hidden', !MASTER.sizes[pid]);
-    document.getElementById('wrapperColor').classList.toggle('hidden', !MASTER.colors[pid]);
-    document.getElementById('wrapperNet').classList.toggle('hidden', spec !== "GPS Cellular");
+    if(!pid) return;
 
-    // Dynamic Selects
-    if(MASTER.specs[pid]) fillSelect('spec', MASTER.specs[pid]);
-    if(MASTER.sizes[pid]) fillSelect('size', MASTER.sizes[pid]);
-    if(MASTER.colors[pid]) fillSelect('color', MASTER.colors[pid]);
+    const toggle = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
+    toggle('wrapperCharging', MASTER.charging[pid]);
+    toggle('wrapperSpec', MASTER.specs[pid]);
+    toggle('wrapperSize', MASTER.sizes[pid]);
+    toggle('wrapperColor', MASTER.colors[pid]);
+    toggle('wrapperNet', spec === "GPS Cellular");
 
-    // Battery Label
+    fillSelectOnce('chargingMethod', MASTER.charging[pid]);
+    fillSelectOnce('spec', MASTER.specs[pid]);
+    fillSelectOnce('size', MASTER.sizes[pid]);
+    fillSelectOnce('color', MASTER.colors[pid]);
+
     document.getElementById('batteryLabel').innerText = ["5", "6", "7", "8", "12"].includes(pid) ? "10分間の消費バッテリー（%）" : "バッテリー最大容量（%）";
 
-    // Appearance Details
-    const apPanel = document.getElementById('appearancePanel');
-    apPanel.classList.toggle('hidden', isUnopened || !pid);
-    const boxC = document.getElementById('boxC');
-    
+    toggle('appearancePanel', pid && !isUnopened);
     if(pid && !isUnopened) {
-        let type = PRODUCTS[pid].cat;
+        const type = PRODUCTS[pid].cat;
+        const boxC = document.getElementById('boxC');
+        const fixedText = document.getElementById('fixedText');
         if(pid === "12") boxC.classList.add('hidden'); else boxC.classList.remove('hidden');
+
         if(["9", "10"].includes(pid)) {
-            document.getElementById('fixedText').classList.remove('hidden');
-            ['boxA','boxB','boxC'].forEach(b => document.getElementById(b).classList.add('hidden'));
+            fixedText.classList.remove('hidden');
+            ['boxA','boxB','boxC'].forEach(id => document.getElementById(id).classList.add('hidden'));
         } else {
-            document.getElementById('fixedText').classList.add('hidden');
-            ['boxA','boxB','boxC'].forEach(b => document.getElementById(b).classList.remove('hidden'));
-            const dataSet = MASTER.details[type === "pencil" ? "audio" : (type === "watch" ? "watch" : (type === "airpods" ? "audio" : type))];
-            fillDetail('A', dataSet.A); fillDetail('B', dataSet.B); fillDetail('C', dataSet.C);
+            fixedText.classList.add('hidden');
+            ['boxA','boxB','boxC'].forEach(id => document.getElementById(id).classList.remove('hidden'));
+            const group = MASTER.details[type === "pencil" ? "audio" : (type === "watch" ? "watch" : (type === "airpods" ? "audio" : type))];
+            if(group) {
+                fillDetail('A', group.A); fillDetail('B', group.B); fillDetail('C', group.C);
+            }
         }
     }
-
-    // Band Details Panel
     const hasGenuine = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).some(i => i.value === "スポーツバンド（アップル純正）");
-    document.getElementById('bandDetails').classList.toggle('hidden', !hasGenuine);
+    toggle('bandDetails', hasGenuine);
 }
 
-function fillSelect(id, arr) {
+function fillSelectOnce(id, arr) {
     const el = document.getElementById(id);
-    if(el.options.length > 1) return;
+    if(!arr || el.options.length > 1) return;
     arr.forEach(v => el.innerHTML += `<option value="${v}">${v}</option>`);
 }
 
 function fillDetail(suffix, arr) {
     const el = document.getElementById('detail' + suffix);
+    if(!arr || el.options.length > 1) return;
     el.innerHTML = '<option value="">-- 選択してください --</option>';
-    if(arr) arr.forEach(v => el.innerHTML += `<option value="${v}">${v}</option>`);
+    arr.forEach(v => el.innerHTML += `<option value="${v}">${v}</option>`);
 }
 
-// Logic from getKw function (system-core-code.tsx)
 function getKeywords(pid, charging, color) {
     if (pid === "7") return charging === "USB-C" ? "MTJV3J/A AirPodsPro2" : "MQD83J/A AirPodsPro2";
     if (pid === "8") return "MFHP4J/A AirPodsPro3";
@@ -256,24 +355,24 @@ function getKeywords(pid, charging, color) {
 
 function generate() {
     const pid = document.getElementById('productId').value;
-    if(!pid || !document.getElementById('condition').value) return alert("必須項目を入力してください");
+    const cond = document.getElementById('condition').value;
+    const ship = document.getElementById('shippingRank').value;
+    if(!pid || !cond || !ship) return alert("必須項目を入力してください");
 
     const p = PRODUCTS[pid];
     const charging = document.getElementById('chargingMethod').value;
     const spec = document.getElementById('spec').value;
     const size = document.getElementById('size').value;
     const color = document.getElementById('color').value;
-    const cond = document.getElementById('condition').value;
     const kw = getKeywords(pid, charging, color);
 
-    const accessories = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value);
-    const isNewBundle = accessories.includes("新品同梱品と同じ");
+    const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value);
+    const isNewBundle = checkedAccs.includes("新品同梱品と同じ");
 
-    // Build Text (Logic from generatedText in React)
     let text = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim() + "\n\n";
     text += "━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n\n【同梱物】\n";
     if(!isNewBundle) text += "・本体\n";
-    accessories.forEach(a => text += `・${a}\n`);
+    checkedAccs.forEach(a => text += `・${a}\n`);
     if(!isNewBundle) text += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
 
     text += `\n【外観状態】\n■${cond}\n`;
@@ -286,18 +385,20 @@ function generate() {
         text += "\n※簡易清掃を行なった上で、撮影を行なっています。\n画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n";
     }
 
-    // Battery Logic
     const bVal = document.getElementById('battery').value;
     if(bVal) {
-        if(["5", "6", "7", "8"].includes(pid)) text += `・バッテリーは、10分の音楽再生で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
-        else if(pid === "12") text += `・バッテリーは、10分の接続で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
-        else text += `・バッテリー最大容量は「${bVal}%」です。\n\n`;
+        const bNum = parseInt(bVal);
+        if(["5", "6", "7", "8"].includes(pid)) text += `・バッテリーは、10分の音楽再生で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
+        else if(pid === "12") text += `・バッテリーは、10分の接続で約${bNum}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
+        else text += `・バッテリー最大容量は「${bNum}%」です。\n\n`;
     }
 
-    // Reset Logic
     if(p.cat === "trackpad") text += "・本体のリセット済み\n";
     else if(p.cat === "airpods") text += "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
     else text += "・本体の初期化、アクティベーションロック解除済み\n";
+
+    const notes = document.getElementById('appearanceNotes').value;
+    if(notes) text += `\n${notes}\n`;
 
     const net = document.getElementById('netRestriction').value;
     if(net) text += `・ネットワーク利用制限：${net}\n`;
@@ -305,17 +406,14 @@ function generate() {
     const warranty = document.getElementById('warranty').value;
     if(warranty) {
         text += `\n■${warranty}\n`;
-        if(warranty === "Apple Care Service") text += "（AppleCare+の通信キャリア版で保証内容は同等です）\n";
-        else if(warranty === "AppleCare+") text += "（故障・盗難・紛失時に割安でサポート対応）\n";
-        else text += "（Appleの保証サービス）\n";
+        const wMsg = (warranty === "Apple Care Service") ? "（AppleCare+の通信キャリア版で保証内容は同等です）" : (warranty === "AppleCare+" ? "（故障・盗難・紛失時に割安でサポート対応）" : "（Appleの保証サービス）");
+        text += `${wMsg}\n`;
     }
 
     text += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n";
-    
-    const rank = document.getElementById('shippingRank').value;
-    text += MASTER.shipping[rank].text + "\n\n";
+    text += MASTER.shipping[ship].text + "\n\n";
 
-    if(accessories.includes("充電ケーブル（テスト用）")) text += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
+    if(checkedAccs.includes("充電ケーブル（テスト用）")) text += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
 
     if(isNewBundle) {
         text += "※新品・未開封品ですが、あくまでも二次流通品となります。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。";
@@ -323,9 +421,10 @@ function generate() {
         text += "※中古品の性質上、傷の具合やバッテリーの消耗等、全く同じ製品はありません。\n価格交渉は、販売時点の相場、出品期間等を踏まえて価格相談機能でのみ回答します。\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。";
     }
 
-    document.getElementById('output-area').innerText = text;
-    document.getElementById('output-area').style.display = 'block';
-    navigator.clipboard.writeText(text).then(() => alert("コピーしました！"));
+    const out = document.getElementById('output-area');
+    out.innerText = text;
+    out.style.display = 'block';
+    navigator.clipboard.writeText(text).then(() => alert("説明文をコピーしました！"));
 }
 
 init();
