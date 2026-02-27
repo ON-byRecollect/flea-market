@@ -53,17 +53,15 @@
 
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         
-        /* ボタン共通スタイル */
         button { 
-            font-family: var(--font-main); width: 100%; padding: 16px; border: none; border-radius: 14px; 
-            font-size: 1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s;
-            margin-bottom: 8px;
+            font-family: var(--font-main); width: 100%; padding: 18px; border: none; border-radius: 14px; 
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s;
+            margin-bottom: 12px;
         }
-        .btn-copy-title { background: #e2e2e9; color: #1c1c1e; width: auto; padding: 10px 20px; font-size: 0.85rem; }
-        .btn-copy-body { background: var(--primary); color: white; margin-top: 10px; font-size: 1.1rem; padding: 18px; }
+        .btn-copy-title { background: #e2e2e9; color: #1c1c1e; }
+        .btn-copy-body { background: var(--primary); color: white; margin-top: 10px; }
         button:active { transform: scale(0.98); opacity: 0.9; }
 
-        /* 生成エリア */
         .output-wrapper { 
             margin-top: 30px; border-top: 2px solid var(--bg); padding-top: 20px;
             display: flex; flex-direction: column; align-items: center; 
@@ -74,7 +72,15 @@
             border: 1.5px solid var(--border-color); margin-bottom: 8px;
             word-break: break-all; width: 100%; box-sizing: border-box;
         }
-        #output-body { font-size: 12.5px; width: 25em; max-width: 100%; padding: 16px; margin-bottom: 8px; }
+        
+        /* 本文プレビュー：正確な25文字折り返し（修正版） */
+        #output-body { 
+            font-size: 13px; /* 基本サイズ */
+            width: 325px; /* 13px * 25文字 = 325px で正確に固定 */
+            max-width: 100%; /* スマホ画面からはみ出さない */
+            padding: 16px; margin-bottom: 8px; 
+            display: block; margin-left: auto; margin-right: auto;
+        }
 
         .output-label { font-size: 0.8rem; font-weight: 700; color: #8e8e93; margin-bottom: 6px; align-self: flex-start; }
         .char-count { width: 100%; text-align: right; font-size: 0.75rem; color: #8e8e93; font-weight: 500; margin-bottom: 12px; }
@@ -107,7 +113,7 @@
         </div>
         <div id="wrapperColor" class="hidden">
             <label>カラー <span class="required">*</span></label>
-            <select id="color" onchange="autoGenerate()"></select>
+            <select id="color" onchange="updateUI(); autoGenerate();"></select>
         </div>
     </div>
 
@@ -291,7 +297,6 @@ function validateInputs() {
     return true;
 }
 
-// 自動プレビュー生成ロジック
 function autoGenerate() {
     if(!validateInputs()) {
         document.getElementById('output-wrapper').classList.add('hidden');
