@@ -7,8 +7,8 @@
     <meta name="apple-mobile-web-app-title" content="商品登録">
     <title>商品登録</title>
     
-    <link rel="icon" href="pen.png" type="image/png">
-    <link rel="apple-touch-icon" href="pen.png">
+    <link rel="icon" href="make.png" type="image/png">
+    <link rel="apple-touch-icon" href="make.png">
     
     <link rel="stylesheet" href="https://static.line-scdn.net/lineseed-jp/edge/fonts.css">
     <style>
@@ -34,7 +34,6 @@
         }
         h1 { font-size: 1.1rem; text-align: center; margin-bottom: 12px; font-weight: 700; }
         
-        /* リセットボタン */
         .btn-reset { 
             background: var(--error); color: white; width: 100%; padding: 14px; 
             border: none; border-radius: 14px; font-size: 0.9rem; font-weight: 700; 
@@ -53,7 +52,6 @@
         }
         select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
         
-        /* 同梱物UI */
         .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .checkbox-item { 
             display: flex; align-items: center; justify-content: center; text-align: center;
@@ -69,7 +67,6 @@
 
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         
-        /* コピーボタン */
         button.btn-copy { 
             font-family: var(--font-main); width: 100%; padding: 18px; border: none; border-radius: 14px; 
             font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s;
@@ -78,7 +75,6 @@
         .btn-copy-title { background: #e2e2e9; color: #1c1c1e; }
         .btn-copy-body { background: var(--primary); color: white; margin-top: 10px; }
 
-        /* プレビュー窓 */
         .output-wrapper { 
             margin-top: 30px; border-top: 2px solid var(--bg); padding-top: 20px;
             display: flex; flex-direction: column; align-items: center; 
@@ -334,7 +330,6 @@ function processCopy(type) {
         navigator.clipboard.writeText(body).then(() => showToast("本文をコピーしました"));
     }
 }
-// 即時初期化
 init();
 </script>
 </body>
