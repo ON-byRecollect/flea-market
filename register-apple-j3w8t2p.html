@@ -313,6 +313,7 @@ function autoGenerate() {
         if(["9", "10"].includes(pid)) bodyText += "新品未開封の状態です。\n"; 
         else { bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n${document.getElementById('detailC').value}\n`; } 
         const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } 
+        // 句読点（、）を修正
         bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
     }
     const bVal = document.getElementById('battery').value; let batteryLine = ""; let hasNotesText = false;
@@ -332,7 +333,6 @@ function autoGenerate() {
     bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n" + MASTER.shipping[ship].text + "\n\n";
     if(checkedAccs.includes("充電ケーブル（未使用／互換品／テスト用）")) bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
     
-    // 文末セクション：共通の価格交渉歓迎テキストを適用
     const commonFooter = "━━━━━━━━━━━━━━━━━━━━\n出品直後でも価格交渉歓迎！\n━━━━━━━━━━━━━━━━━━━━\n無視、ブロックはしませんので何度でもご相談ください。";
     if(isNewCond) {
         bodyText += `${commonFooter}\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。`; 
