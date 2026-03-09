@@ -98,7 +98,7 @@
 
     <div class="section">
         <div id="wrapperCharging" class="hidden"><label>充電方式 <span class="required">*</span></label><select id="chargingMethod" onchange="autoGenerate()"></select></div>
-        <div id="wrapperSpec" class="hidden"><label id="labelSpec">スペック <span class="required">*</span></label><select id="spec" onchange="autoGenerate()"></select></div>
+        <div id="wrapperSpec" class="hidden"><label id="labelSpec">スペック <span class="required">*</span></label><select id="spec" onchange="updateUI(); autoGenerate();"></select></div>
         <div id="wrapperSize" class="hidden"><label>サイズ <span class="required">*</span></label><select id="size" onchange="autoGenerate()"></select></div>
         <div id="wrapperColor" class="hidden"><label>カラー <span class="required">*</span></label><select id="color" onchange="updateUI(); autoGenerate();"></select></div>
     </div>
@@ -129,7 +129,7 @@
 
     <div class="section">
         <div id="wrapperBattery"><label id="batteryLabel">バッテリー最大容量 (%) <span class="required">*</span></label><input type="number" id="battery" oninput="autoGenerate()" placeholder="0-100"></div>
-        <div id="wrapperBatteryType" class="hidden"><label>バッテリー交換履歴 <span class="required">*</span></label><select id="batteryType" onchange="autoGenerate()"><option value="">選択してください</option><option value="※総務省登録修理店にて交換済みの他社バッテリー">登録修理店での交換（他社製）</option><option value="※Apple純正バッテリー">Apple純正バッテリー</option></select></div>
+        <div id="wrapperBatteryType" class="hidden"><label>バッテリー交換履歴 <span class="required">*</span></label><select id="batteryType" onchange="autoGenerate()"><option value="">選択してください</option><option value="※Apple純正バッテリー">Apple純正バッテリー</option><option value="※総務省登録修理店にて交換済みの他社バッテリー">登録修理店での交換（他社製）</option></select></div>
         <div id="wrapperIMEI" class="hidden"><label>IMEI <span class="required">*</span></label><input type="text" id="imei" oninput="autoGenerate()" placeholder="IMEI番号を入力"></div>
         <div id="wrapperNet" class="hidden"><label id="labelNet">ネットワーク利用制限 <span class="required">*</span></label><select id="netRestriction" onchange="autoGenerate()"><option value="">選択してください</option><option value="-">-</option><option value="○">○</option></select></div>
         <label>保証</label><select id="warranty" onchange="autoGenerate()"><option value="">選択なし</option><option value="Apple Care Service">Apple Care Service</option><option value="AppleCare+">AppleCare+</option><option value="Apple製品限定保証">Apple製品限定保証</option></select>
@@ -157,7 +157,6 @@ const MASTER = {
     charging: { "12": ["Lightning", "USB-C"] }, sizes: { "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] },
     colors: { "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"], "12": ["ホワイト", "ブラック"], "13": ["スターライト", "レッド", "ミッドナイト", "ブルー", "ピンク", "グリーン"] },
     shipping: { "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" }, "B": { label: "B - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }, "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" } },
-    // 同梱物を追加
     accs: ["シリコンバンド（未使用／互換品）", "スポーツバンド（アップル純正）", "充電ケーブル（未使用／互換品／テスト用）", "充電ケーブル（アップル純正）", "イヤーチップ", "ACアダプター", "電源ケーブル", "SIMピン", "新品同梱品と同じ", "外箱", "外箱／リーフレット"],
     details: { 
         watch: { 
@@ -209,13 +208,20 @@ function resetAll() {
 
 function updateUI() {
     const pid = document.getElementById('productId').value; if(!pid) return;
-    const cat = PRODUCTS[pid].cat; const isCellular = document.getElementById('spec').value === "GPS Cellular";
+    const cat = PRODUCTS[pid].cat; 
+    const specVal = document.getElementById('spec').value;
+    const isCellular = (specVal === "GPS Cellular");
     const toggle = (id, show) => document.getElementById(id).classList.toggle('hidden', !show);
+    
     toggle('wrapperCharging', MASTER.charging[pid]); toggle('wrapperSpec', MASTER.specs[pid]); toggle('wrapperSize', MASTER.sizes[pid]); toggle('wrapperColor', MASTER.colors[pid]); toggle('wrapperBattery', pid !== "11");
-    toggle('wrapperNet', cat === "iphone" || (cat === "watch" && isCellular)); toggle('wrapperBatteryType', cat === "iphone"); toggle('wrapperIMEI', cat === "iphone");
+    toggle('wrapperNet', cat === "iphone" || (cat === "watch" && isCellular));
+    toggle('wrapperBatteryType', cat === "iphone");
+    toggle('wrapperIMEI', cat === "iphone");
+    
     document.getElementById('labelSpec').innerText = (cat === "iphone") ? "容量 *" : "スペック *";
     fillSelectOnce('chargingMethod', MASTER.charging[pid]); fillSelectOnce('spec', MASTER.specs[pid]); fillSelectOnce('size', MASTER.sizes[pid]); fillSelectOnce('color', MASTER.colors[pid]);
     document.getElementById('batteryLabel').innerHTML = (["5", "6", "7", "8", "12"].includes(pid) ? "10分間の消費バッテリー（%）" : "バッテリー最大容量（%）") + ' <span class="required">*</span>';
+    
     const condSelect = document.getElementById('condition'); const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
     if (cat === "pencil") {
         condSelect.value = "未開封の「新品／未使用」状態"; condSelect.disabled = true;
@@ -259,7 +265,8 @@ function getKeywords(pid, spec, charging, color) {
 
 function validateInputs() {
     const pid = document.getElementById('productId').value; if(!pid) return false;
-    const cat = PRODUCTS[pid].cat; const isCellular = document.getElementById('spec').value === "GPS Cellular";
+    const cat = PRODUCTS[pid].cat; const specVal = document.getElementById('spec').value;
+    const isCellular = (specVal === "GPS Cellular");
     if(!document.getElementById('wrapperCharging').classList.contains('hidden') && !document.getElementById('chargingMethod').value) return false;
     if(!document.getElementById('wrapperSpec').classList.contains('hidden') && !document.getElementById('spec').value) return false;
     if(!document.getElementById('wrapperSize').classList.contains('hidden') && !document.getElementById('size').value) return false;
@@ -291,7 +298,7 @@ function autoGenerate() {
     bodyText += `\n【外観状態】\n■${cond}\n`;
     if(!isNewCond) { 
         bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n${document.getElementById('detailC').value}\n`;
-        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は,${bCond}\n`; } 
+        const notes = document.getElementById('appearanceNotes').value; if(notes) bodyText += `${notes}\n`; if (checkedAccs.includes("スポーツバンド（アップル純正）")) { const bSize = document.getElementById('bandSize').value; const bColor = document.getElementById('bandColor').value; const bCond = document.getElementById('bandCondition').value; if (bSize && bCond) bodyText += `スポーツバンド「${bSize}」サイズの${bColor ? `「${bColor}」` : ""}は、${bCond}\n`; } 
         bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
     }
     const bVal = document.getElementById('battery').value;
@@ -320,7 +327,7 @@ function autoGenerate() {
     
     const warranty = document.getElementById('warranty').value; if(warranty) { bodyText += `\n■${warranty}\n`; const wMsg = (warranty === "Apple Care Service") ? "（AppleCare+の通信キャリア版で保証内容は同等です）" : (warranty === "AppleCare+" ? "（故障・盗難・紛失時に割安でサポート対応）" : "（自然故障であれば無償で修理が可能です）"); bodyText += `${wMsg}\n`; }
     bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n" + MASTER.shipping[ship].text + "\n\n";
-    if(checkedAccs.includes("充電ケーブル（未使用／互換品／テスト用）")) bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
+    if(checkedAccs.includes("充電ケーブル（未使用／互換品／テスト用）")) bodyText += "※充電ケーブル（テスト用）は,受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
     const commonFooter = "━━━━━━━━━━━━━━━━━━━━\n出品直後でも価格交渉歓迎！\n━━━━━━━━━━━━━━━━━━━━\n無視、ブロックはしませんので何度でもご相談ください。";
     if(isNewCond) bodyText += `${commonFooter}\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。`; 
     else bodyText += `${commonFooter}\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。`;
