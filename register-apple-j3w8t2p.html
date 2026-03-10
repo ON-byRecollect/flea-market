@@ -707,19 +707,25 @@ function autoGenerate() {
     const isNewCond = (cond === "未開封の「新品／未使用」状態");
     
     let titleLine = "";
+    let bodyTitleLine = "";
+    
     if (cat === "iphone") {
         titleLine = kw;
+        bodyTitleLine = titleLine;
     } else if (cat === "macbook") {
         let modelNum = "";
         if (color === "シルバー") modelNum = "MGN93J/A";
         else if (color === "スペースグレイ") modelNum = "MGN63J/A";
         else if (color === "ゴールド") modelNum = "MGND3J/A";
+        
         titleLine = `Apple M1 MacBook Air Retina 13.3 ${modelNum} ${color} ${ramVal} ${ssdVal}`;
+        bodyTitleLine = `Apple M1 MacBookAir 13インチ ${modelNum} ${color} ${ramVal} ${ssdVal} マックブック Mac`;
     } else {
         titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
+        bodyTitleLine = titleLine;
     }
     
-    let bodyText = titleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n";
+    let bodyText = bodyTitleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n";
     
     if (cat === "macbook") {
         bodyText += `13.3インチ、RetinaディスプレイのM1モデル。\nメモリは${ramVal}で、ストレージは${ssdVal}です。\n\n`;
