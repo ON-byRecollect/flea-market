@@ -785,7 +785,10 @@ function autoGenerate() {
     }
     
     let initMsg = "";
-    if (cat === "iphone" || cat === "watch") {
+    if (cat === "iphone") {
+        // 【v17.14追加】iPhoneカテゴリのみ、初期化メッセージの前に空行（\n）を入れる例外処理
+        initMsg = "\n・本体の初期化、アクティベーションロック解除済み\n";
+    } else if (cat === "watch") {
         initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
     } else if (cat === "macbook") {
         initMsg = "・初期化、アクティベーションロック／アカウント連携解除済み\n";
