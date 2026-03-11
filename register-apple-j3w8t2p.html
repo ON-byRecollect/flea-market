@@ -291,7 +291,7 @@ const MASTER = {
     },
     colors: { 
         "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], 
-        "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"], "12": ["ホワイト", "ブラック"], "13": ["スターライト", "レッド", "ミッドナイト", "ブルー", "ピンク", "グリーン"],
+        "11": ["ホワイト", "スペースグレイ", "ブルー", "オレンジ", "イエロー", "ミッドナイト"], "12": ["ホワイト", "ブラック"], "13": ["スターライト", "レッド", "ミッドナイト", "ブルー", "ピンク", "グリーン"],
         "14": ["スペースグレイ", "シルバー", "ゴールド"]
     },
     shipping: { 
@@ -623,7 +623,18 @@ function getKeywords(pid, spec, charging, color) {
     if (cat === "watch") return "アップルウォッチ applewatch";
     if (name === "Apple Pencil 第1世代") return "MK0C2JA MYQW3JA アップルペンシル";
     if (name === "Apple Pencil 第2世代") return "MU8F2JA MXN43JA アップルペンシル";
-    if (name === "Apple HomePod mini") return "ホームポッドミニ HomePodmini";
+    
+    if (name === "Apple HomePod mini") {
+        let modelNum = "";
+        if (color === "ホワイト") modelNum = "MY5H2J/A";
+        else if (color === "スペースグレイ") modelNum = "MY5G2J/A";
+        else if (color === "ブルー") modelNum = "MJ2C3J/A";
+        else if (color === "オレンジ") modelNum = "MJ2D3J/A";
+        else if (color === "イエロー") modelNum = "MJ2E3J/A";
+        else if (color === "ミッドナイト") modelNum = "MTJT3J/A";
+        return `ホームポッドミニ HomePodmini ${modelNum}`;
+    }
+    
     if (pid === "12") return `${color} マジックトラックパッド`;
     
     return "";
@@ -786,7 +797,6 @@ function autoGenerate() {
     
     let initMsg = "";
     if (cat === "iphone") {
-        // 【v17.14追加】iPhoneカテゴリのみ、初期化メッセージの前に空行（\n）を入れる例外処理
         initMsg = "\n・本体の初期化、アクティベーションロック解除済み\n";
     } else if (cat === "watch") {
         initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
