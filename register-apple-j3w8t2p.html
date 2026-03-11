@@ -415,10 +415,10 @@ const MASTER = {
                 "キーボード、トラックパッドは細かいスレや小傷（1mm以下）があり、やや使用感がありますが、問題なく使用できます。"
             ],
             C: [
-                "天板、側面、背面は目立つ傷、スレ、剥げ等はなく、ゴム足の劣化を含め使用感は少なめです。",
-                "天板、側面、背面は薄いスレ、剥げ等はありますがゴム足の劣化は少なく、目立つ傷もありません。",
-                "天板、側面、背面は薄いスレや小傷（1mm以下）がありますが、ゴム足の劣化は少なく、使用には問題ありません。",
-                "天板、側面、背面は薄いスレや小傷（1mm以下）があり、ややゴム足の劣化がありますが、使用に影響が出る程の劣化はなく、問題なく使用可能です。"
+                "天板、側面、底面は目立つ傷、スレ、剥げ等はなく、ゴム足の劣化を含め使用感は少なめです。",
+                "天板、側面、底面は薄いスレ、剥げ等はありますがゴム足の劣化は少なく、目立つ傷もありません。",
+                "天板、側面、底面は薄いスレや小傷（1mm以下）がありますが、ゴム足の劣化は少なく、使用には問題ありません。",
+                "天板、側面、底面は薄いスレや小傷（1mm以下）があり、ややゴム足の劣化がありますが、使用に影響が出る程の劣化はなく、問題なく使用可能です。"
             ]
         }
     }
@@ -523,7 +523,7 @@ function updateUI() {
     if (cat === "macbook") {
         document.getElementById('labelA').innerHTML = '詳細A（画面） <span class="required">*</span>';
         document.getElementById('labelB').innerHTML = '詳細B（キーボード／トラックパッド） <span class="required">*</span>';
-        document.getElementById('labelC').innerHTML = '詳細C（天板／側面／背面） <span class="required">*</span>';
+        document.getElementById('labelC').innerHTML = '詳細C（天板／側面／底面） <span class="required">*</span>';
     } else {
         document.getElementById('labelA').innerHTML = '詳細A <span class="required">*</span>';
         document.getElementById('labelB').innerHTML = '詳細B <span class="required">*</span>';
@@ -849,7 +849,7 @@ function autoGenerate() {
     bodyText += MASTER.shipping[ship].text + "\n\n";
     
     if(checkedAccs.includes("充電ケーブル（未使用／互換品／テスト用）")) {
-        bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です。耐久性や品質は保証致しかねます。\n\n";
+        bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です.耐久性や品質は保証致しかねます。\n\n";
     }
     
     const commonFooter = "━━━━━━━━━━━━━━━━━━━━\n出品直後でも価格交渉歓迎！\n━━━━━━━━━━━━━━━━━━━━\n無視、ブロックはしませんので何度でもご相談ください。";
