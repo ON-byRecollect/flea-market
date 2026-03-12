@@ -680,16 +680,16 @@ function autoGenerate() {
     if(!isNewBundle) {
         bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
         
-        // 移動した3パターンの免責テキスト
+        // 3パターンの免責テキストの前に改行（\n）を入れて空行を作る
         const hasSilicone = checkedAccs.includes("シリコンバンド（未使用／互換品）");
         const hasCable = checkedAccs.includes("充電ケーブル（未使用／互換品）");
         
         if (hasSilicone && hasCable) {
-            bodyText += "※シリコンバンド／充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
+            bodyText += "\n※シリコンバンド／充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
         } else if (hasCable) {
-            bodyText += "※充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
+            bodyText += "\n※充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
         } else if (hasSilicone) {
-            bodyText += "※シリコンバンドは、撮影を行う際に一時的に開封していますのでご了承ください。\n";
+            bodyText += "\n※シリコンバンドは、撮影を行う際に一時的に開封していますのでご了承ください。\n";
         }
     }
     
