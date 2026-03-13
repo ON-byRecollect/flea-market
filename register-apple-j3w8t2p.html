@@ -226,7 +226,7 @@
         <select id="warranty" onchange="autoGenerate()">
             <option value="">選択なし</option>
             <option value="Apple Care Service">Apple Care Service</option>
-            <option value="AppleCare+">AppleCare+</option>
+            <option value="Apple Care+">Apple Care+</option>
             <option value="Apple製品限定保証">Apple製品限定保証</option>
         </select>
     </div>
@@ -680,7 +680,6 @@ function autoGenerate() {
     if(!isNewBundle) {
         bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
         
-        // 3パターンの免責テキストの前に改行（\n）を入れて空行を作る
         const hasSilicone = checkedAccs.includes("シリコンバンド（未使用／互換品）");
         const hasCable = checkedAccs.includes("充電ケーブル（未使用／互換品）");
         
@@ -770,8 +769,8 @@ function autoGenerate() {
     if(warranty) { 
         bodyText += `\n■${warranty}\n`; 
         if (warranty === "Apple Care Service") {
-            bodyText += "（AppleCare+の通信キャリア版で保証内容は同等です）\n";
-        } else if (warranty === "AppleCare+") {
+            bodyText += "（Apple Care+の通信キャリア版で保証内容は同等です）\n";
+        } else if (warranty === "Apple Care+") {
             bodyText += "（故障・盗難・紛失時に割安でサポート対応）\n";
         } else {
             bodyText += "（自然故障であれば無償で修理が可能です）\n";
