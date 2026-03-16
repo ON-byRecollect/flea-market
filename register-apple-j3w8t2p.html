@@ -132,6 +132,14 @@
             <label>サイズ <span class="required">*</span></label>
             <select id="size" onchange="autoGenerate()"></select>
         </div>
+        <div id="wrapperRam" class="hidden">
+            <label>RAM <span class="required">*</span></label>
+            <select id="ram" onchange="autoGenerate()"></select>
+        </div>
+        <div id="wrapperSsd" class="hidden">
+            <label>SSD <span class="required">*</span></label>
+            <select id="ssd" onchange="autoGenerate()"></select>
+        </div>
         <div id="wrapperColor" class="hidden">
             <label>カラー <span class="required">*</span></label>
             <select id="color" onchange="updateUI(); autoGenerate();"></select>
@@ -226,7 +234,7 @@
         <select id="warranty" onchange="autoGenerate()">
             <option value="">選択なし</option>
             <option value="Apple Care Service">Apple Care Service</option>
-            <option value="Apple Care+">Apple Care+</option>
+            <option value="AppleCare+">AppleCare+</option>
             <option value="Apple製品限定保証">Apple製品限定保証</option>
         </select>
     </div>
@@ -266,45 +274,36 @@ const PRODUCTS = {
     "10": { name: "Apple Pencil 第2世代", cat: "pencil" }, 
     "11": { name: "Apple HomePod mini", cat: "homepod" }, 
     "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" }, 
-    "13": { name: "Apple iPhone13 mini", cat: "iphone" } 
+    "13": { name: "Apple iPhone13 mini", cat: "iphone" },
+    "14": { name: "MacBook Air 13.3 M1", cat: "macbook" }
 };
 
 const MASTER = {
     specs: { 
-        "1": ["GPS", "GPS Cellular"], 
-        "2": ["GPS", "GPS Cellular"], 
-        "3": ["GPS", "GPS Cellular"], 
-        "4": ["GPS", "GPS Cellular"], 
-        "7": ["Lightning", "USB-C"], 
-        "13": ["64GB", "128GB", "256GB"] 
+        "1": ["GPS", "GPS Cellular"], "2": ["GPS", "GPS Cellular"], "3": ["GPS", "GPS Cellular"], "4": ["GPS", "GPS Cellular"], 
+        "7": ["Lightning", "USB-C"], "13": ["64GB", "128GB", "256GB"] 
     },
-    charging: { 
-        "12": ["Lightning", "USB-C"] 
-    }, 
+    rams: { "14": ["8GB", "16GB", "32GB"] },
+    ssds: { "14": ["128GB", "256GB", "512GB"] },
+    charging: { "12": ["Lightning", "USB-C"] }, 
     sizes: { 
-        "1": ["40mm", "44mm"], 
-        "2": ["40mm", "44mm"], 
-        "3": ["42mm", "46mm"], 
-        "4": ["42mm", "46mm"] 
+        "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] 
     },
     colors: { 
-        "1": ["ミッドナイト", "スターライト", "シルバー"], 
-        "2": ["ミッドナイト", "スターライト"], 
-        "3": ["ジェットブラック", "シルバー", "ローズゴールド"], 
-        "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], 
-        "11": ["ブルー", "ホワイト", "ミッドナイト", "スペースグレイ"], 
-        "12": ["ホワイト", "ブラック"], 
-        "13": ["スターライト", "レッド", "ミッドナイト", "ブルー", "ピンク", "グリーン"] 
+        "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], 
+        "11": ["ホワイト", "スペースグレイ", "ブルー", "オレンジ", "イエロー", "ミッドナイト"], "12": ["ホワイト", "ブラック"], "13": ["スターライト", "レッド", "ミッドナイト", "ブルー", "ピンク", "グリーン"],
+        "14": ["スペースグレイ", "シルバー", "ゴールド"]
     },
     shipping: { 
         "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" }, 
         "B": { label: "B - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }, 
-        "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" } 
+        "C": { label: "C - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" },
+        "D": { label: "D - ネコポス（送料無料）", text: "■ネコポス（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：可能\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※配送日数に違いはありません。\n※変更を希望される場合は、購入前にご申告ください。" }
     },
     accs: [
         "シリコンバンド（未使用／互換品）", 
         "スポーツバンド（アップル純正）", 
-        "充電ケーブル（未使用／互換品）", 
+        "充電ケーブル（未使用／互換品／テスト用）", 
         "充電ケーブル（アップル純正）", 
         "イヤーチップ", 
         "ACアダプター", 
@@ -403,6 +402,25 @@ const MASTER = {
                 "背面は薄いスレや小傷（1mm以下）がありますが、使用には問題ありません。", 
                 "背面は薄いスレ、カメラレンズに剥げがありますが、使用には問題ありません。"
             ]
+        },
+        macbook: {
+            A: [
+                "画面は肉眼でわかる傷、スレ、割れはなくドット抜け等もありません。",
+                "画面は細かいスレはありますが目立つ傷や、ドット抜け等はありません。",
+                "画面は線状のスレがあり、使用感がややありますがドット抜け等はなく視認性に影響もありません。"
+            ],
+            B: [
+                "キーボード、トラックパッドは肉眼でわかる傷、スレ、印字かすれ、キーのたわみ等がなく使用感は少なめです。",
+                "キーボード、トラックパッドは細かいスレはありますが、目立つ傷、印字かすれ、キーのたわみ等はありません。",
+                "キーボード、トラックパッドは細かいスレや小傷（1mm以下）はありますが、印字かすれやキーのたわみはなく、使用に影響はありません。",
+                "キーボード、トラックパッドは細かいスレや小傷（1mm以下）があり、やや使用感がありますが、問題なく使用できます。"
+            ],
+            C: [
+                "天板、側面、底面は目立つ傷、スレ、剥げ等はなく、ゴム足の劣化を含め使用感は少なめです。",
+                "天板、側面、底面は薄いスレ、剥げ等はありますがゴム足の劣化は少なく、目立つ傷もありません。",
+                "天板、側面、底面は薄いスレや小傷（1mm以下）がありますが、ゴム足の劣化は少なく、使用には問題ありません。",
+                "天板、側面、底面は薄いスレや小傷（1mm以下）があり、ややゴム足の劣化がありますが、使用に影響が出る程の劣化はなく、問題なく使用可能です。"
+            ]
         }
     }
 };
@@ -422,7 +440,7 @@ function init() {
         let displayLabel = a;
         if (a === "シリコンバンド（未使用／互換品）") {
             displayLabel = "シリコンバンド（互換品）";
-        } else if (a === "充電ケーブル（未使用／互換品）") {
+        } else if (a === "充電ケーブル（未使用／互換品／テスト用）") {
             displayLabel = "充電ケーブル（互換品）";
         }
         
@@ -442,7 +460,7 @@ function init() {
 }
 
 function resetAndFillUI() {
-    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC'].forEach(id => {
+    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'ram', 'ssd'].forEach(id => {
         document.getElementById(id).innerHTML = '<option value="">選択してください</option>';
     });
     updateUI();
@@ -465,6 +483,8 @@ function resetAll() {
         document.getElementById(id).value = ""; 
     });
     
+    document.getElementById('shippingRank').disabled = false;
+    
     updateUI(); 
     autoGenerate(); 
     showToast("リセットしました");
@@ -482,9 +502,11 @@ function updateUI() {
         document.getElementById(id).classList.toggle('hidden', !show);
     };
     
-    toggle('wrapperCharging', MASTER.charging[pid]); 
-    toggle('wrapperSpec', MASTER.specs[pid]); 
-    toggle('wrapperSize', MASTER.sizes[pid]); 
+    toggle('wrapperCharging', MASTER.charging[pid] && cat !== "macbook"); 
+    toggle('wrapperSpec', MASTER.specs[pid] && cat !== "macbook"); 
+    toggle('wrapperSize', MASTER.sizes[pid] && cat !== "macbook"); 
+    toggle('wrapperRam', cat === "macbook");
+    toggle('wrapperSsd', cat === "macbook");
     toggle('wrapperColor', MASTER.colors[pid]); 
     toggle('wrapperBattery', pid !== "11");
     
@@ -492,15 +514,28 @@ function updateUI() {
     toggle('wrapperBatteryType', cat === "iphone"); 
     toggle('wrapperIMEI', cat === "iphone");
     
+    // 赤い必須マークのスタイルを完全に維持しつつラベル切り替え
     if (cat === "iphone") {
         document.getElementById('labelSpec').innerHTML = '容量 <span class="required">*</span>';
     } else {
         document.getElementById('labelSpec').innerHTML = 'スペック <span class="required">*</span>';
     }
+
+    if (cat === "macbook") {
+        document.getElementById('labelA').innerHTML = '詳細A（画面） <span class="required">*</span>';
+        document.getElementById('labelB').innerHTML = '詳細B（キーボード／トラックパッド） <span class="required">*</span>';
+        document.getElementById('labelC').innerHTML = '詳細C（天板／側面／底面） <span class="required">*</span>';
+    } else {
+        document.getElementById('labelA').innerHTML = '詳細A <span class="required">*</span>';
+        document.getElementById('labelB').innerHTML = '詳細B <span class="required">*</span>';
+        document.getElementById('labelC').innerHTML = '詳細C <span class="required">*</span>';
+    }
     
     fillSelectOnce('chargingMethod', MASTER.charging[pid]); 
     fillSelectOnce('spec', MASTER.specs[pid]); 
     fillSelectOnce('size', MASTER.sizes[pid]); 
+    fillSelectOnce('ram', MASTER.rams[pid]);
+    fillSelectOnce('ssd', MASTER.ssds[pid]);
     fillSelectOnce('color', MASTER.colors[pid]);
     
     if (["5", "6", "7", "8", "12"].includes(pid)) {
@@ -511,7 +546,15 @@ function updateUI() {
     
     const condSelect = document.getElementById('condition'); 
     const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
+    const sRank = document.getElementById('shippingRank');
     
+    if (cat === "macbook") {
+        sRank.value = "C";
+        sRank.disabled = true;
+    } else {
+        sRank.disabled = false;
+    }
+
     if (cat === "pencil") {
         condSelect.value = "未開封の「新品／未使用」状態"; 
         condSelect.disabled = true;
@@ -581,7 +624,18 @@ function getKeywords(pid, spec, charging, color) {
     if (cat === "watch") return "アップルウォッチ applewatch";
     if (name === "Apple Pencil 第1世代") return "MK0C2JA MYQW3JA アップルペンシル";
     if (name === "Apple Pencil 第2世代") return "MU8F2JA MXN43JA アップルペンシル";
-    if (name === "Apple HomePod mini") return "ホームポッドミニ HomePodmini";
+    
+    if (name === "Apple HomePod mini") {
+        let modelNum = "";
+        if (color === "ホワイト") modelNum = "MY5H2J/A";
+        else if (color === "スペースグレイ") modelNum = "MY5G2J/A";
+        else if (color === "ブルー") modelNum = "MJ2C3J/A";
+        else if (color === "オレンジ") modelNum = "MJ2D3J/A";
+        else if (color === "イエロー") modelNum = "MJ2E3J/A";
+        else if (color === "ミッドナイト") modelNum = "MTJT3J/A";
+        return `ホームポッドミニ HomePodmini ${modelNum}`;
+    }
+    
     if (pid === "12") return `${color} マジックトラックパッド`;
     
     return "";
@@ -598,6 +652,8 @@ function validateInputs() {
     if(!document.getElementById('wrapperCharging').classList.contains('hidden') && !document.getElementById('chargingMethod').value) return false;
     if(!document.getElementById('wrapperSpec').classList.contains('hidden') && !document.getElementById('spec').value) return false;
     if(!document.getElementById('wrapperSize').classList.contains('hidden') && !document.getElementById('size').value) return false;
+    if(!document.getElementById('wrapperRam').classList.contains('hidden') && !document.getElementById('ram').value) return false;
+    if(!document.getElementById('wrapperSsd').classList.contains('hidden') && !document.getElementById('ssd').value) return false;
     if(!document.getElementById('wrapperColor').classList.contains('hidden') && !document.getElementById('color').value) return false;
     
     const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked'));
@@ -653,6 +709,8 @@ function autoGenerate() {
     const spec = document.getElementById('spec').value; 
     const charging = document.getElementById('chargingMethod').value;
     const size = document.getElementById('size').value;
+    const ramVal = document.getElementById('ram').value;
+    const ssdVal = document.getElementById('ssd').value;
     const color = document.getElementById('color').value;
     
     const kw = getKeywords(pid, spec, charging, color); 
@@ -661,13 +719,31 @@ function autoGenerate() {
     const isNewCond = (cond === "未開封の「新品／未使用」状態");
     
     let titleLine = "";
+    let bodyTitleLine = "";
+    
     if (cat === "iphone") {
         titleLine = kw;
+        bodyTitleLine = titleLine;
+    } else if (cat === "macbook") {
+        let modelNum = "";
+        if (color === "シルバー") modelNum = "MGN93J/A";
+        else if (color === "スペースグレイ") modelNum = "MGN63J/A";
+        else if (color === "ゴールド") modelNum = "MGND3J/A";
+        
+        titleLine = `Apple M1 MacBook Air Retina 13.3 ${modelNum} ${color} ${ramVal} ${ssdVal}`;
+        bodyTitleLine = `Apple M1 MacBookAir 13インチ ${modelNum} ${color} ${ramVal} ${ssdVal} マックブック Mac`;
     } else {
         titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
+        bodyTitleLine = titleLine;
     }
     
-    let bodyText = titleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n【同梱物】\n";
+    let bodyText = bodyTitleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n";
+    
+    if (cat === "macbook") {
+        bodyText += `13.3インチ、RetinaディスプレイのM1モデル。\nメモリは${ramVal}で、ストレージは${ssdVal}です。\n\n`;
+    }
+    
+    bodyText += "【同梱物】\n";
     
     if (!isNewBundle) {
         bodyText += "・本体\n";
@@ -679,17 +755,6 @@ function autoGenerate() {
     
     if(!isNewBundle) {
         bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
-        
-        const hasSilicone = checkedAccs.includes("シリコンバンド（未使用／互換品）");
-        const hasCable = checkedAccs.includes("充電ケーブル（未使用／互換品）");
-        
-        if (hasSilicone && hasCable) {
-            bodyText += "\n※シリコンバンド／充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
-        } else if (hasCable) {
-            bodyText += "\n※充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
-        } else if (hasSilicone) {
-            bodyText += "\n※シリコンバンドは、撮影を行う際に一時的に開封していますのでご了承ください。\n";
-        }
     }
     
     bodyText += `\n【外観状態】\n■${cond}\n`;
@@ -732,8 +797,12 @@ function autoGenerate() {
     }
     
     let initMsg = "";
-    if (cat === "iphone" || cat === "watch") {
+    if (cat === "iphone") {
+        initMsg = "\n・本体の初期化、アクティベーションロック解除済み\n";
+    } else if (cat === "watch") {
         initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
+    } else if (cat === "macbook") {
+        initMsg = "・初期化、アクティベーションロック／アカウント連携解除済み\n";
     } else if (["5", "6", "7", "8"].includes(pid)) {
         initMsg = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
     } else {
@@ -769,8 +838,8 @@ function autoGenerate() {
     if(warranty) { 
         bodyText += `\n■${warranty}\n`; 
         if (warranty === "Apple Care Service") {
-            bodyText += "（Apple Care+の通信キャリア版で保証内容は同等です）\n";
-        } else if (warranty === "Apple Care+") {
+            bodyText += "（AppleCare+の通信キャリア版で保証内容は同等です）\n";
+        } else if (warranty === "AppleCare+") {
             bodyText += "（故障・盗難・紛失時に割安でサポート対応）\n";
         } else {
             bodyText += "（自然故障であれば無償で修理が可能です）\n";
@@ -779,6 +848,10 @@ function autoGenerate() {
 
     bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n";
     bodyText += MASTER.shipping[ship].text + "\n\n";
+    
+    if(checkedAccs.includes("充電ケーブル（未使用／互換品／テスト用）")) {
+        bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です.耐久性や品質は保証致しかねます。\n\n";
+    }
     
     const commonFooter = "━━━━━━━━━━━━━━━━━━━━\n出品直後でも価格交渉歓迎！\n━━━━━━━━━━━━━━━━━━━━\n無視、ブロックはしませんので何度でもご相談ください。";
     
