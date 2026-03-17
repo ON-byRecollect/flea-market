@@ -321,7 +321,7 @@ const MASTER = {
     accs: [
         "シリコンバンド（未使用／互換品）", 
         "スポーツバンド（アップル純正）", 
-        "充電ケーブル（未使用／互換品／テスト用）", 
+        "充電ケーブル（未使用／互換品）", 
         "充電ケーブル（アップル純正）", 
         "イヤーチップ", 
         "ACアダプター", 
@@ -458,7 +458,7 @@ function init() {
         let displayLabel = a;
         if (a === "シリコンバンド（未使用／互換品）") {
             displayLabel = "シリコンバンド（互換品）";
-        } else if (a === "充電ケーブル（未使用／互換品／テスト用）") {
+        } else if (a === "充電ケーブル（未使用／互換品）") {
             displayLabel = "充電ケーブル（互換品）";
         }
         
@@ -532,7 +532,6 @@ function updateUI() {
     toggle('wrapperBatteryType', cat === "iphone"); 
     toggle('wrapperIMEI', cat === "iphone");
     
-    // 赤い必須マークのスタイルを完全に維持しつつラベル切り替え
     if (cat === "iphone") {
         document.getElementById('labelSpec').innerHTML = '容量 <span class="required">*</span>';
     } else {
@@ -567,7 +566,7 @@ function updateUI() {
     const sRank = document.getElementById('shippingRank');
     
     if (cat === "macbook") {
-        sRank.value = "D"; // D: 宅急便（送料無料）に変更
+        sRank.value = "D";
         sRank.disabled = true;
     } else {
         sRank.disabled = false;
@@ -773,6 +772,17 @@ function autoGenerate() {
     
     if(!isNewBundle) {
         bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
+        
+        const hasCable = checkedAccs.includes("充電ケーブル（未使用／互換品）");
+        const hasBand = checkedAccs.includes("シリコンバンド（未使用／互換品）");
+        
+        if (hasCable && hasBand) {
+            bodyText += "※シリコンバンド／充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
+        } else if (hasCable) {
+            bodyText += "※充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
+        } else if (hasBand) {
+            bodyText += "※シリコンバンドは、撮影を行う際、一時的に開封していますのでご了承ください。\n";
+        }
     }
     
     bodyText += `\n【外観状態】\n■${cond}\n`;
@@ -866,10 +876,6 @@ function autoGenerate() {
 
     bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n";
     bodyText += MASTER.shipping[ship].text + "\n\n";
-    
-    if(checkedAccs.includes("充電ケーブル（未使用／互換品／テスト用）")) {
-        bodyText += "※充電ケーブル（テスト用）は、受取時の動作確認用です.耐久性や品質は保証致しかねます。\n\n";
-    }
     
     const commonFooter = "━━━━━━━━━━━━━━━━━━━━\n出品直後でも価格交渉歓迎！\n━━━━━━━━━━━━━━━━━━━━\n無視、ブロックはしませんので何度でもご相談ください。";
     
