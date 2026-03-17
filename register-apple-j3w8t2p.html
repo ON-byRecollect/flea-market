@@ -776,12 +776,15 @@ function autoGenerate() {
         const hasCable = checkedAccs.includes("充電ケーブル（未使用／互換品）");
         const hasBand = checkedAccs.includes("シリコンバンド（未使用／互換品）");
         
-        if (hasCable && hasBand) {
-            bodyText += "※シリコンバンド／充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
-        } else if (hasCable) {
-            bodyText += "※充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
-        } else if (hasBand) {
-            bodyText += "※シリコンバンドは、撮影を行う際、一時的に開封していますのでご了承ください。\n";
+        if (hasCable || hasBand) {
+            bodyText += "\n";
+            if (hasCable && hasBand) {
+                bodyText += "※シリコンバンド／充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
+            } else if (hasCable) {
+                bodyText += "※充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
+            } else if (hasBand) {
+                bodyText += "※シリコンバンドは、撮影を行う際、一時的に開封していますのでご了承ください。\n";
+            }
         }
     }
     
