@@ -71,6 +71,17 @@
         .checkbox-item:has(input:checked) .checkbox-label { color: var(--accent); font-weight: 700; }
         .checkbox-label { font-size: 0.75rem; font-weight: 500; color: #1c1c1e; pointer-events: none; line-height: 1.4; }
         
+        .checkbox-group-multi { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .checkbox-item-multi { 
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            padding: 8px 12px; background: var(--btn-gray); 
+            border: 1.5px solid var(--border-color); border-radius: 8px; cursor: pointer;
+        }
+        .checkbox-item-multi input { display: none; }
+        .checkbox-item-multi:has(input:checked) { border-color: var(--accent); background: #e5f1ff; }
+        .checkbox-item-multi:has(input:checked) .checkbox-label-multi { color: var(--accent); font-weight: 700; }
+        .checkbox-label-multi { font-size: 0.75rem; font-weight: 500; color: #1c1c1e; pointer-events: none; }
+
         .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
         
         button.btn-copy { 
@@ -170,6 +181,11 @@
                 <option value="使用感はありますが、問題なく着用可能です。">使用感あり・着用可能</option>
             </select>
         </div>
+
+        <div id="eartipDetails" class="sub-panel hidden">
+            <label>イヤーチップサイズ <span class="required">*</span></label>
+            <div id="eartipSizeGroup" class="checkbox-group-multi"></div>
+        </div>
     </div>
 
     <div class="section">
@@ -195,6 +211,15 @@
             <div id="boxC">
                 <label id="labelC">詳細C <span class="required">*</span></label>
                 <select id="detailC" onchange="autoGenerate()"></select>
+            </div>
+            <div id="boxD" class="hidden">
+                <label>詳細D（イヤーチップ） <span class="required">*</span></label>
+                <select id="detailD" onchange="autoGenerate()">
+                    <option value="">-- 選択してください --</option>
+                    <option value="イヤーチップは、劣化や使用感がほとんどない良好な状態です。">良好な状態</option>
+                    <option value="イヤーチップは、やや使用感がありますが、使用に影響する程の劣化はありません、">やや使用感あり</option>
+                    <option value="イヤーチップは、使用感がありますが、問題なく使用可能です。">使用感あり（使用可能）</option>
+                </select>
             </div>
         </div>
         
@@ -332,6 +357,7 @@ const MASTER = {
         "外箱", 
         "外箱／リーフレット"
     ],
+    eartipSizes: ["XS", "S", "M", "L", "未使用／互換品"],
     details: { 
         watch: { 
             A: [
@@ -470,6 +496,15 @@ function init() {
         label.innerHTML = `<input type="checkbox" value="${a}" onchange="updateUI(); autoGenerate();"><span class="checkbox-label">${displayLabel}</span>`;
         accGroup.appendChild(label);
     });
+
+    const tipGroup = document.getElementById('eartipSizeGroup');
+    tipGroup.innerHTML = '';
+    MASTER.eartipSizes.forEach(s => {
+        const label = document.createElement('label');
+        label.className = 'checkbox-item-multi';
+        label.innerHTML = `<input type="checkbox" value="${s}" onchange="updateUI(); autoGenerate();"><span class="checkbox-label-multi">${s}</span>`;
+        tipGroup.appendChild(label);
+    });
     
     const sRank = document.getElementById('shippingRank'); 
     sRank.innerHTML = '<option value="">選択してください</option>';
@@ -479,7 +514,7 @@ function init() {
 }
 
 function resetAndFillUI() {
-    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'ram', 'ssd'].forEach(id => {
+    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'ram', 'ssd', 'detailD'].forEach(id => {
         document.getElementById(id).innerHTML = '<option value="">選択してください</option>';
     });
     updateUI();
@@ -489,7 +524,7 @@ function resetAll() {
     document.getElementById('productId').value = ""; 
     resetAndFillUI();
     
-    document.querySelectorAll('#accessoriesGroup input').forEach(cb => { 
+    document.querySelectorAll('#accessoriesGroup input, #eartipSizeGroup input').forEach(cb => { 
         cb.checked = false; 
         cb.disabled = false; 
     });
@@ -498,7 +533,7 @@ function resetAll() {
         document.getElementById(id).value = "";
     });
     
-    ['condition', 'warranty', 'shippingRank', 'bandSize', 'bandCondition', 'netRestriction', 'batteryType'].forEach(id => { 
+    ['condition', 'warranty', 'shippingRank', 'bandSize', 'bandCondition', 'netRestriction', 'batteryType', 'detailD'].forEach(id => { 
         document.getElementById(id).value = ""; 
     });
     
@@ -514,8 +549,13 @@ function updateUI() {
     if(!pid) return;
     
     const cat = PRODUCTS[pid].cat; 
+    const pName = PRODUCTS[pid].name;
+    const isAirPodsPro = (pName === "Apple AirPods Pro 第2世代" || pName === "Apple AirPods Pro 第3世代");
+
     const specVal = document.getElementById('spec').value;
     const isCellular = (specVal === "GPS Cellular");
+    const condSelect = document.getElementById('condition'); 
+    const isNewCond = (condSelect.value === "未開封の「新品／未使用」状態");
     
     const toggle = (id, show) => {
         document.getElementById(id).classList.toggle('hidden', !show);
@@ -527,7 +567,13 @@ function updateUI() {
     toggle('wrapperRam', cat === "macbook");
     toggle('wrapperSsd', cat === "macbook");
     toggle('wrapperColor', MASTER.colors[pid]); 
-    toggle('wrapperBattery', pid !== "11");
+    
+    // Watchで新品の場合はバッテリー入力を非表示にする
+    if (cat === "watch" && isNewCond) {
+        toggle('wrapperBattery', false);
+    } else {
+        toggle('wrapperBattery', pid !== "11");
+    }
     
     toggle('wrapperNet', cat === "iphone" || (cat === "watch" && isCellular));
     toggle('wrapperBatteryType', cat === "iphone"); 
@@ -562,8 +608,8 @@ function updateUI() {
         document.getElementById('batteryLabel').innerHTML = 'バッテリー最大容量（%） <span class="required">*</span>';
     }
     
-    const condSelect = document.getElementById('condition'); 
     const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
+    const checkedAccs = Array.from(accCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
     const sRank = document.getElementById('shippingRank');
     
     if (cat === "macbook") {
@@ -602,8 +648,22 @@ function updateUI() {
         }
     }
     
-    const hasSportsBand = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).some(i => i.value === "スポーツバンド（アップル純正）");
+    const hasSportsBand = checkedAccs.includes("スポーツバンド（アップル純正）");
     toggle('bandDetails', hasSportsBand);
+
+    const hasEarTip = checkedAccs.includes("イヤーチップ");
+    const showEarTipPanel = isAirPodsPro && hasEarTip;
+    toggle('eartipDetails', showEarTipPanel);
+
+    // 詳細Dの表示判定
+    const eartipCheckboxes = Array.from(document.querySelectorAll('#eartipSizeGroup input:checked')).map(cb => cb.value);
+    const hasUnusedOrCompat = eartipCheckboxes.includes("未使用／互換品");
+    
+    if (showEarTipPanel && !hasUnusedOrCompat && !isNewCond) {
+        toggle('boxD', true);
+    } else {
+        toggle('boxD', false);
+    }
 }
 
 function fillSelectOnce(id, arr) {
@@ -689,6 +749,11 @@ function validateInputs() {
     if(!document.getElementById('bandDetails').classList.contains('hidden')) { 
         if(!document.getElementById('bandSize').value || !document.getElementById('bandCondition').value) return false; 
     }
+
+    if(!document.getElementById('eartipDetails').classList.contains('hidden')) {
+        const checkedEartips = Array.from(document.querySelectorAll('#eartipSizeGroup input:checked'));
+        if (checkedEartips.length === 0) return false;
+    }
     
     const cond = document.getElementById('condition').value; 
     if(!cond) return false;
@@ -696,6 +761,9 @@ function validateInputs() {
     if(cond !== "未開封の「新品／未使用」状態") { 
         if(!document.getElementById('detailA').value || !document.getElementById('detailB').value || !document.getElementById('detailC').value) {
             return false; 
+        }
+        if(!document.getElementById('boxD').classList.contains('hidden') && !document.getElementById('detailD').value) {
+            return false;
         }
     }
     
@@ -725,6 +793,7 @@ function autoGenerate() {
     const ship = document.getElementById('shippingRank').value; 
     const p = PRODUCTS[pid]; 
     const cat = p.cat;
+    const pName = p.name;
     const spec = document.getElementById('spec').value; 
     const charging = document.getElementById('chargingMethod').value;
     const size = document.getElementById('size').value;
@@ -734,8 +803,12 @@ function autoGenerate() {
     
     const kw = getKeywords(pid, spec, charging, color); 
     const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value); 
+    const checkedEartips = Array.from(document.querySelectorAll('#eartipSizeGroup input:checked')).map(i => i.value);
     const isNewBundle = checkedAccs.includes("新品同梱品と同じ"); 
     const isNewCond = (cond === "未開封の「新品／未使用」状態");
+    
+    const isAirPodsPro = (pName === "Apple AirPods Pro 第2世代" || pName === "Apple AirPods Pro 第3世代");
+    const isAirPods系 = (cat === "airpods");
     
     let titleLine = "";
     let bodyTitleLine = "";
@@ -765,11 +838,19 @@ function autoGenerate() {
     bodyText += "【同梱物】\n";
     
     if (!isNewBundle) {
-        bodyText += "・本体\n";
+        if (isAirPods系) {
+            bodyText += "・本体（左右）\n";
+        } else {
+            bodyText += "・本体\n";
+        }
     }
     
     checkedAccs.forEach(a => {
-        bodyText += `・${a}\n`;
+        if (a === "イヤーチップ" && isAirPodsPro && checkedEartips.length > 0) {
+            bodyText += `・イヤーチップ（${checkedEartips.join("／")}）\n`;
+        } else {
+            bodyText += `・${a}\n`;
+        }
     }); 
     
     if(!isNewBundle) {
@@ -792,60 +873,70 @@ function autoGenerate() {
     
     bodyText += `\n【外観状態】\n■${cond}\n`;
     
-    if(!isNewCond) { 
-        bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n${document.getElementById('detailC').value}\n`;
-    }
-
-    const notes = document.getElementById('appearanceNotes').value; 
-    if(notes) {
-        bodyText += `・${notes}\n`;
-    }
-    
-    if(!isNewCond) { 
-        if (checkedAccs.includes("スポーツバンド（アップル純正）")) { 
-            const bSize = document.getElementById('bandSize').value; 
-            const bColor = document.getElementById('bandColor').value; 
-            const bCond = document.getElementById('bandCondition').value; 
-            
-            if (bSize && bCond) {
-                let colorText = bColor ? `「${bColor}」` : "";
-                bodyText += `スポーツバンド「${bSize}」サイズの${colorText}は、${bCond}\n`; 
-            }
-        } 
-        
-        bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
-    }
-    
-    const bVal = document.getElementById('battery').value;
-    if(pid !== "11" && bVal) {
-        if(["5", "6", "7", "8"].includes(pid)) {
-            bodyText += `・バッテリーは、10分の音楽再生で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
-        } else if(pid === "12") {
-            bodyText += `・バッテリーは、10分の接続で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
-        } else {
-            bodyText += `・バッテリー最大容量は「${bVal}%」です。\n`;
-        }
-    }
-    
-    if(cat === "iphone") { 
-        bodyText += document.getElementById('batteryType').value + "\n"; 
-    }
-    
-    let initMsg = "";
-    if (cat === "iphone") {
-        initMsg = "\n・本体の初期化、アクティベーションロック解除済み\n";
-    } else if (cat === "watch") {
-        initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
-    } else if (cat === "macbook") {
-        initMsg = "・初期化、アクティベーションロック／アカウント連携解除済み\n";
-    } else if (["5", "6", "7", "8"].includes(pid)) {
-        initMsg = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
+    if (cat === "watch" && isNewCond) {
+        bodyText += "・アクティベーションは行なっていません。\n　Apple製品限定保証は、初期設定日から1年間となります。\n";
     } else {
-        initMsg = "・本体のリセット済み\n";
-    }
-    
-    if (!isNewBundle) {
-        bodyText += initMsg;
+        if(!isNewCond) { 
+            bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n${document.getElementById('detailC').value}\n`;
+            
+            if(!document.getElementById('boxD').classList.contains('hidden')) {
+                bodyText += `${document.getElementById('detailD').value}\n`;
+            }
+        }
+
+        const notes = document.getElementById('appearanceNotes').value; 
+        if(notes) {
+            bodyText += `・${notes}\n`;
+        }
+        
+        if(!isNewCond) { 
+            if (checkedAccs.includes("スポーツバンド（アップル純正）")) { 
+                const bSize = document.getElementById('bandSize').value; 
+                const bColor = document.getElementById('bandColor').value; 
+                const bCond = document.getElementById('bandCondition').value; 
+                
+                if (bSize && bCond) {
+                    let colorText = bColor ? `「${bColor}」` : "";
+                    bodyText += `スポーツバンド「${bSize}」サイズの${colorText}は、${bCond}\n`; 
+                }
+            } 
+            
+            bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
+        }
+        
+        const bVal = document.getElementById('battery').value;
+        if(pid !== "11" && bVal) {
+            if(isAirPodsPro || pName === "Apple AirPods 4 ANC") {
+                bodyText += `・バッテリーは、10分の音楽再生（ANC）で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
+            } else if(["5", "6"].includes(pid)) {
+                bodyText += `・バッテリーは、10分の音楽再生で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
+            } else if(pid === "12") {
+                bodyText += `・バッテリーは、10分の接続で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
+            } else {
+                bodyText += `・バッテリー最大容量は「${bVal}%」です。\n`;
+            }
+        }
+        
+        if(cat === "iphone") { 
+            bodyText += document.getElementById('batteryType').value + "\n"; 
+        }
+        
+        let initMsg = "";
+        if (cat === "iphone") {
+            initMsg = "\n・本体の初期化、アクティベーションロック解除済み\n";
+        } else if (cat === "watch") {
+            initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
+        } else if (cat === "macbook") {
+            initMsg = "・初期化、アクティベーションロック／アカウント連携解除済み\n";
+        } else if (["5", "6", "7", "8"].includes(pid)) {
+            initMsg = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
+        } else {
+            initMsg = "・本体のリセット済み\n";
+        }
+        
+        if (!isNewBundle) {
+            bodyText += initMsg;
+        }
     }
 
     const net = document.getElementById('netRestriction').value;
