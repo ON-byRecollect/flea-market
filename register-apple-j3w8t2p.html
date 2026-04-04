@@ -514,7 +514,7 @@ function init() {
 }
 
 function resetAndFillUI() {
-    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'ram', 'ssd', 'detailD'].forEach(id => {
+    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'ram', 'ssd'].forEach(id => {
         document.getElementById(id).innerHTML = '<option value="">選択してください</option>';
     });
     updateUI();
@@ -854,7 +854,11 @@ function autoGenerate() {
     }); 
     
     if(!isNewBundle) {
-        bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
+        if (cat === "watch" && checkedAccs.includes("外箱／リーフレット") && checkedAccs.includes("充電ケーブル（アップル純正）")) {
+            bodyText += "\n※新品同梱品と同じ内容を発送します。\n";
+        } else {
+            bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
+        }
         
         const hasCable = checkedAccs.includes("充電ケーブル（未使用／互換品）");
         const hasBand = checkedAccs.includes("シリコンバンド（未使用／互換品）");
