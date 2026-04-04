@@ -216,9 +216,9 @@
                 <label>詳細D（イヤーチップ） <span class="required">*</span></label>
                 <select id="detailD" onchange="autoGenerate()">
                     <option value="">-- 選択してください --</option>
-                    <option value="イヤーチップは、劣化や使用感がほとんどない良好な状態です。">良好な状態</option>
-                    <option value="イヤーチップは、やや使用感がありますが、使用に影響する程の劣化はありません、">やや使用感あり</option>
-                    <option value="イヤーチップは、使用感がありますが、問題なく使用可能です。">使用感あり（使用可能）</option>
+                    <option value="イヤーチップは、劣化や使用感がほとんどない良好な状態です。">イヤーチップは、劣化や使用感がほとんどない良好な状態です。</option>
+                    <option value="イヤーチップは、やや使用感がありますが、使用に影響する程の劣化はありません、">イヤーチップは、やや使用感がありますが、使用に影響する程の劣化はありません、</option>
+                    <option value="イヤーチップは、使用感がありますが、問題なく使用可能です。">イヤーチップは、使用感がありますが、問題なく使用可能です。</option>
                 </select>
             </div>
         </div>
@@ -514,9 +514,12 @@ function init() {
 }
 
 function resetAndFillUI() {
+    // detailDをリセット対象から除外（選択肢が消えるバグを修正）
     ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'ram', 'ssd'].forEach(id => {
         document.getElementById(id).innerHTML = '<option value="">選択してください</option>';
     });
+    // detailDは選択状態（value）のみリセット
+    document.getElementById('detailD').value = "";
     updateUI();
 }
 
@@ -529,11 +532,11 @@ function resetAll() {
         cb.disabled = false; 
     });
     
-    ['appearanceNotes', 'battery', 'bandColor', 'imei'].forEach(id => {
+    ['appearanceNotes', 'battery', 'bandColor', 'imei', 'detailD'].forEach(id => {
         document.getElementById(id).value = "";
     });
     
-    ['condition', 'warranty', 'shippingRank', 'bandSize', 'bandCondition', 'netRestriction', 'batteryType', 'detailD'].forEach(id => { 
+    ['condition', 'warranty', 'shippingRank', 'bandSize', 'bandCondition', 'netRestriction', 'batteryType'].forEach(id => { 
         document.getElementById(id).value = ""; 
     });
     
