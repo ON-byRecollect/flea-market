@@ -226,7 +226,7 @@
     <div class="section">
         <div id="wrapperBattery">
             <label id="batteryLabel">バッテリー最大容量 (%) <span class="required">*</span></label>
-            <input type="number" id="battery" oninput="autoGenerate()" placeholder="0-100">
+            <input type="number" id="battery" oninput="autoGenerate()" placeholder="0-100" inputmode="numeric" pattern="[0-9]*">
         </div>
         
         <div id="wrapperBatteryType" class="hidden">
@@ -916,7 +916,10 @@ function autoGenerate() {
             if(color==="オレンジ") modelNum="MHWN4ZA/A";
         }
         titleLine = `${p.name} ${spec} ${color} ${modelNum} エアポッズマックス`;
-        bodyTitleLine = titleLine;
+        
+        let specAlias = spec === "Lightning" ? "ライトニング" : "USB-C";
+        let genText = pid === "15" ? "第一世代" : "第二世代";
+        bodyTitleLine = `アップル AirPodsMax ${genText} エアポッズ ${specAlias}`;
     } else {
         titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
         bodyTitleLine = titleLine;
