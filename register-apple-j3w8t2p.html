@@ -213,13 +213,9 @@
                 <select id="detailC" onchange="autoGenerate()"></select>
             </div>
             <div id="boxD" class="hidden">
-                <label>詳細D（イヤーチップ） <span class="required">*</span></label>
+                <label id="labelD">詳細D <span class="required">*</span></label>
                 <select id="detailD" onchange="autoGenerate()">
-                    <option value="">-- 選択してください --</option>
-                    <option value="イヤーチップは、劣化や使用感がほとんどない良好な状態です。">イヤーチップは、劣化や使用感がほとんどない良好な状態です。</option>
-                    <option value="イヤーチップは、やや使用感がありますが、使用に影響する程の劣化はありません、">イヤーチップは、やや使用感がありますが、使用に影響する程の劣化はありません、</option>
-                    <option value="イヤーチップは、使用感がありますが、問題なく使用可能です。">イヤーチップは、使用感がありますが、問題なく使用可能です。</option>
-                </select>
+                    </select>
             </div>
         </div>
         
@@ -318,17 +314,19 @@ const PRODUCTS = {
     "11": { name: "Apple HomePod mini", cat: "homepod" }, 
     "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" }, 
     "13": { name: "Apple iPhone13 mini", cat: "iphone" },
-    "14": { name: "MacBook Air 13.3 M1", cat: "macbook" }
+    "14": { name: "MacBook Air 13.3 M1", cat: "macbook" },
+    "15": { name: "Apple AirPods Max（第1世代）", cat: "max" },
+    "16": { name: "Apple AirPods Max（第2世代）", cat: "max" }
 };
 
 const MASTER = {
     specs: { 
         "1": ["GPS", "GPS Cellular"], "2": ["GPS", "GPS Cellular"], "3": ["GPS", "GPS Cellular"], "4": ["GPS", "GPS Cellular"], 
-        "7": ["Lightning", "USB-C"], "13": ["64GB", "128GB", "256GB"] 
+        "7": ["Lightning", "Type-C"], "13": ["64GB", "128GB", "256GB"], "15": ["Lightning", "Type-C"], "16": ["Type-C"]
     },
     rams: { "14": ["8GB", "16GB", "32GB"] },
     ssds: { "14": ["128GB", "256GB", "512GB"] },
-    charging: { "12": ["Lightning", "USB-C"] }, 
+    charging: { "12": ["Lightning", "Type-C"] }, 
     sizes: { 
         "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] 
     },
@@ -350,6 +348,8 @@ const MASTER = {
         "充電ケーブル（アップル純正）", 
         "充電ケース",
         "イヤーチップ", 
+        "イヤーカップ（左右）",
+        "ヘッドフォンカバー（アップル純正）",
         "ACアダプター", 
         "電源ケーブル", 
         "SIMピン", 
@@ -362,39 +362,72 @@ const MASTER = {
         watch: { 
             A: [
                 "画面は肉眼でわかる傷、スレ、割れはありません。", 
-                "画面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", 
-                "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"
+                "画面は肉眼では気にならない程度の薄いスレがありますが、点灯時に目につく程の大きな傷はありません。", 
+                "画面は浅めの傷やスレがありますが、1mm以上の目立つ傷はなく、操作性や視認性に影響はありません。",
+                "画面は線状のスレがありますが、点灯時に視認性を低下させる程の目立つ傷はありません。"
             ], 
             B: [
                 "側面は肉眼でわかる傷、スレ、剥げはありません。", 
-                "側面は微細な剥げがありますが、目立つ傷はありません。", 
-                "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。", 
-                "側面は細かいスレがありますが、目立つ傷はありません。"
+                "側面は微細な剥げがありますが、1mm以上の目立つ傷はありません。", 
+                "側面は浅め傷やスレがありますが、1mm以上の目立つ傷はありません。", 
+                "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"
             ], 
             C: [
                 "背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", 
-                "背面に微細な剥げがありますが、装着時には気にならない箇所です。", 
-                "背面に細かいスレ、ベルト接続部に剥げがありますが、装着時には気にならない箇所です。", 
-                "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所です。"
+                "背面に微細な剥げがありますが、装着時には気にならない箇所で、大きな傷はありません。", 
+                "背面に細かいスレ、ベルト接続部に剥げがありますが、装着時には気にならない箇所で、1mm以上の大きな傷はありません。", 
+                "背面は線状のスレや微細な剥げがありますが、装着時には気にならない箇所で、目立つ傷はありません。",
+                "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所で、他に目立つ傷はありません。"
             ] 
         }, 
         audio: { 
             A: [
                 "ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", 
-                "ケース外装は、浅い傷や微細なスレがありますが目立つ傷はありません。", 
-                "ケース外装は、浅い傷やスレ、使用感がありますが使用に問題はありません。"
+                "ケース外装は、浅い傷や微細なスレがありますが、1mm以上の打痕や目立つ傷はありません。", 
+                "ケース外装は、線状の細かいスレがありますが、深く目立つ傷はありません。",
+                "ケース外装は、浅い傷やスレ等、やや使用感がありますが、1mm以上の大きな打痕や傷はありません。"
             ], 
             B: [
                 "ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", 
-                "ケース内側は、薄い汚れや微細な擦れ等はありますが、目立つ傷はありません。", 
-                "ケース内側は、やや使用感がありますが使用に問題はありません。"
+                "ケース内側は、細かいスレや汚れ等がありますが、比較的良好な状態です。", 
+                "ケース内側は、細かいスレや汚れ等、やや使用感がありますが目立つ傷はありません。",
+                "ケース内側は、やや使用感がありますが、使用に影響が出る損傷等はありません。"
             ], 
             C: [
                 "イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", 
-                "イヤホン本体は、浅い傷や微細なスレがありますが1cm以上の大きな傷はありません。", 
-                "イヤホン本体は、細かい傷やスレ、使用感がありますが使用に問題はありません。"
-            ] 
+                "イヤホン本体は、浅い傷や微細なスレがありますが1mm以上の大きな傷はありません。", 
+                "イヤホン本体は、浅い傷やスレ等、やや使用感がありますが使用に影響が出る損傷等はありません。"
+            ],
+            D: [
+                "イヤーチップは、劣化や使用感がほとんどない良好な状態です。",
+                "イヤーチップは、やや使用感がありますが、使用に影響する程の劣化はありません、",
+                "イヤーチップは、使用感がありますが、問題なく使用可能です。"
+            ]
         }, 
+        max: {
+            A: [
+                "外装は肉眼でわかる傷、スレ、汚れがほとんどありません。",
+                "外装は微細なスレや剥げがありますが、1mm以上の目立つ傷や打痕はありません。",
+                "外装は線状のスレ、微細な傷等がありますが、1mm以上の目立つ傷はありません。",
+                "外装は浅い傷やスレ、使用感がありますが使用に影響する程の深い傷はありません。"
+            ],
+            B: [
+                "ヘッドバンドは肉眼でわかる傷や汚れ、破れやたわみ等の劣化はほとんどありません。",
+                "ヘッドバンドは浅い傷や微細なスレがありますが、破れはなく、たわみ等の劣化も少なく、比較的良好です。",
+                "ヘッドバンドは浅い傷や微細なスレ、たわみ等、やや使用感がありますが、使用に影響がある破れや損傷はありません。"
+            ],
+            C: [
+                "イヤーカップは肉眼でわかる傷や汚れ、破れ等の劣化はほとんどありません。",
+                "イヤーカップは浅い傷や微細なスレがありますが、破れはなく比較的良好です。",
+                "イヤーカップは浅い傷や微細なスレ等、やや使用感がありますが、使用に影響がある破れや損傷はありません。"
+            ],
+            D: [
+                "ケースは肉眼でわかる傷、スレ、汚れがほとんどありません。",
+                "ケースは微細なスレ等はありますが、目立つ汚れや劣化は少なめで比較的良好です。",
+                "ケースは微細なスレ等があり、やや経年劣化を感じる箇所もありますが、目立つ損傷や激しく劣化した部分はありません。",
+                "ケースはスレ等があり、経年劣化を感じる箇所もありますが、致命的な劣化はない為、問題なく使用可能です。"
+            ]
+        },
         homepod: { 
             A: [
                 "パネル面は肉眼でわかる傷、スレ、割れはありません。", 
@@ -437,15 +470,16 @@ const MASTER = {
             ],
             B: [
                 "側面は肉眼でわかる傷、スレ、剥げはありません。", 
-                "側面は細かいスレ、剥げ等はありますが目立つ傷はありません。", 
-                "側面は細かいスレがありますが、目立つ傷はありません。", 
-                "側面はスレや小傷（1mm以下）がありますが、使用には問題ありません。"
+                "側面は細かいスレ、剥げ等はありますが、1mm以上の目立つ傷はありません。", 
+                "側面は細かいスレがありますが、1mm以上の目立つ傷はありません。", 
+                "側面はスレや小傷がありますが、1mm以上の深い傷はありません。",
+                "側面はスレや剥げ等がありますが、使用に影響する程の深い傷はありません。"
             ],
             C: [
                 "背面は目立つ傷、スレ、剥げ等はなく使用感は少なめです。", 
-                "背面は薄いスレ、剥げ等はありますが目立つ傷はありません。", 
-                "背面は薄いスレや小傷（1mm以下）がありますが、使用には問題ありません。", 
-                "背面は薄いスレ、カメラレンズに剥げがありますが、使用には問題ありません。"
+                "背面は薄いスレ、剥げ等はありますが1mm以上の目立つ傷はありません。", 
+                "背面は薄いスレや小傷がありますが、1mm以上の目立つ傷はありません。", 
+                "背面は薄いスレ、カメラレンズに剥げがありますが、他の部分には1mm以上の目立つ傷等はありません。"
             ]
         },
         macbook: {
@@ -457,14 +491,14 @@ const MASTER = {
             B: [
                 "キーボード、トラックパッドは肉眼でわかる傷、スレ、印字かすれ、キーのたわみ等がなく使用感は少なめです。",
                 "キーボード、トラックパッドは細かいスレはありますが、目立つ傷、印字かすれ、キーのたわみ等はありません。",
-                "キーボード、トラックパッドは細かいスレや小傷（1mm以下）はありますが、印字かすれやキーのたわみはなく、使用に影響はありません。",
-                "キーボード、トラックパッドは細かいスレや小傷（1mm以下）があり、やや使用感がありますが、問題なく使用できます。"
+                "キーボード、トラックパッドは細かいスレや小傷はありますが、1mm以上の目立つ傷、印字かすれやキーのたわみはなく、使用に影響はありません。",
+                "キーボード、トラックパッドは細かいスレや小傷があり、やや使用感がありますが、1mm以上の目立つ傷はなく、問題なく使用できます。"
             ],
             C: [
                 "天板、側面、底面は目立つ傷、スレ、剥げ等はなく、ゴム足の劣化を含め使用感は少なめです。",
                 "天板、側面、底面は薄いスレ、剥げ等はありますがゴム足の劣化は少なく、目立つ傷もありません。",
-                "天板、側面、底面は薄いスレや小傷（1mm以下）がありますが、ゴム足の劣化は少なく、使用には問題ありません。",
-                "天板、側面、底面は薄いスレや小傷（1mm以下）があり、ややゴム足の劣化がありますが、使用に影響が出る程の劣化はなく、問題なく使用可能です。"
+                "天板、側面、底面は薄いスレや小傷がありますが、1mm以上の目立つ傷はなく、ゴム足の劣化も少なめです。",
+                "天板、側面、底面は薄いスレや小傷があり、ややゴム足の劣化がありますが、1mm以上の目立つ傷はなく、使用に影響が出る程の劣化はなく、問題なく使用可能です。"
             ]
         }
     }
@@ -474,8 +508,13 @@ function init() {
     const pSel = document.getElementById('productId'); 
     pSel.innerHTML = '<option value="">選択してください</option>';
     
-    Object.entries(PRODUCTS).forEach(([id, p]) => {
-        pSel.innerHTML += `<option value="${id}">${p.name}</option>`;
+    // 表示順の指定
+    const order = ["1", "2", "3", "4", "5", "6", "7", "8", "15", "16", "9", "10", "11", "12", "13", "14"];
+    order.forEach(id => {
+        const p = PRODUCTS[id];
+        if (p) {
+            pSel.innerHTML += `<option value="${id}">${p.name}</option>`;
+        }
     });
     
     const accGroup = document.getElementById('accessoriesGroup'); 
@@ -514,12 +553,9 @@ function init() {
 }
 
 function resetAndFillUI() {
-    // detailDをリセット対象から除外（選択肢が消えるバグを修正）
-    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'ram', 'ssd'].forEach(id => {
+    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'detailD', 'ram', 'ssd'].forEach(id => {
         document.getElementById(id).innerHTML = '<option value="">選択してください</option>';
     });
-    // detailDは選択状態（value）のみリセット
-    document.getElementById('detailD').value = "";
     updateUI();
 }
 
@@ -569,9 +605,33 @@ function updateUI() {
     toggle('wrapperSize', MASTER.sizes[pid] && cat !== "macbook"); 
     toggle('wrapperRam', cat === "macbook");
     toggle('wrapperSsd', cat === "macbook");
-    toggle('wrapperColor', MASTER.colors[pid]); 
     
-    // Watchで新品の場合はバッテリー入力を非表示にする
+    // カラーの動的生成 (Max系とそれ以外)
+    let currentColors = MASTER.colors[pid];
+    if (cat === "max") {
+        toggle('wrapperColor', true);
+        if (pid === "15" && specVal === "Lightning") {
+            currentColors = ["スペースグレイ", "シルバー", "スカイブルー", "グリーン", "ピンク"];
+        } else if ((pid === "15" && specVal === "Type-C") || pid === "16") {
+            currentColors = ["ミッドナイト", "スターライト", "ブルー", "パープル", "オレンジ"];
+        } else {
+            currentColors = []; 
+        }
+        
+        const colorEl = document.getElementById('color');
+        const currentColor = colorEl.value;
+        colorEl.innerHTML = '<option value="">選択してください</option>';
+        if(currentColors) {
+            currentColors.forEach(v => {
+                const selected = (v === currentColor) ? ' selected' : '';
+                colorEl.innerHTML += `<option value="${v}"${selected}>${v}</option>`;
+            });
+        }
+    } else {
+        toggle('wrapperColor', !!currentColors);
+        fillSelectOnce('color', currentColors);
+    }
+    
     if (cat === "watch" && isNewCond) {
         toggle('wrapperBattery', false);
     } else {
@@ -592,10 +652,16 @@ function updateUI() {
         document.getElementById('labelA').innerHTML = '詳細A（画面） <span class="required">*</span>';
         document.getElementById('labelB').innerHTML = '詳細B（キーボード／トラックパッド） <span class="required">*</span>';
         document.getElementById('labelC').innerHTML = '詳細C（天板／側面／底面） <span class="required">*</span>';
+    } else if (cat === "max") {
+        document.getElementById('labelA').innerHTML = '詳細A（外装） <span class="required">*</span>';
+        document.getElementById('labelB').innerHTML = '詳細B（ヘッドバンド） <span class="required">*</span>';
+        document.getElementById('labelC').innerHTML = '詳細C（イヤーカップ） <span class="required">*</span>';
+        document.getElementById('labelD').innerHTML = '詳細D（ケース） <span class="required">*</span>';
     } else {
         document.getElementById('labelA').innerHTML = '詳細A <span class="required">*</span>';
         document.getElementById('labelB').innerHTML = '詳細B <span class="required">*</span>';
         document.getElementById('labelC').innerHTML = '詳細C <span class="required">*</span>';
+        document.getElementById('labelD').innerHTML = '詳細D（イヤーチップ） <span class="required">*</span>';
     }
     
     fillSelectOnce('chargingMethod', MASTER.charging[pid]); 
@@ -603,9 +669,8 @@ function updateUI() {
     fillSelectOnce('size', MASTER.sizes[pid]); 
     fillSelectOnce('ram', MASTER.rams[pid]);
     fillSelectOnce('ssd', MASTER.ssds[pid]);
-    fillSelectOnce('color', MASTER.colors[pid]);
     
-    if (["5", "6", "7", "8", "12"].includes(pid)) {
+    if (["5", "6", "7", "8", "12", "15", "16"].includes(pid)) {
         document.getElementById('batteryLabel').innerHTML = '10分間の消費バッテリー（%） <span class="required">*</span>';
     } else {
         document.getElementById('batteryLabel').innerHTML = 'バッテリー最大容量（%） <span class="required">*</span>';
@@ -615,7 +680,7 @@ function updateUI() {
     const checkedAccs = Array.from(accCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
     const sRank = document.getElementById('shippingRank');
     
-    if (cat === "macbook") {
+    if (cat === "macbook" || cat === "max") {
         sRank.value = "D";
         sRank.disabled = true;
     } else {
@@ -647,6 +712,7 @@ function updateUI() {
                 fillDetail('A', group.A); 
                 fillDetail('B', group.B); 
                 fillDetail('C', group.C); 
+                if(group.D) fillDetail('D', group.D);
             }
         }
     }
@@ -658,11 +724,12 @@ function updateUI() {
     const showEarTipPanel = isAirPodsPro && hasEarTip;
     toggle('eartipDetails', showEarTipPanel);
 
-    // 詳細Dの表示判定
     const eartipCheckboxes = Array.from(document.querySelectorAll('#eartipSizeGroup input:checked')).map(cb => cb.value);
     const hasUnusedOrCompat = eartipCheckboxes.includes("未使用／互換品");
     
-    if (showEarTipPanel && !hasUnusedOrCompat && !isNewCond) {
+    if (cat === "max" && !isNewCond) {
+        toggle('boxD', true);
+    } else if (showEarTipPanel && !hasUnusedOrCompat && !isNewCond) {
         toggle('boxD', true);
     } else {
         toggle('boxD', false);
@@ -700,7 +767,7 @@ function getKeywords(pid, spec, charging, color) {
     const e2 = color;
     
     if (name === "Apple AirPods Pro 第2世代" && c2 === "Lightning") return "MQD83J/A エアポッツプロ AirPodsPro2";
-    if (name === "Apple AirPods Pro 第2世代" && c2 === "USB-C") return "MTJV3J/A エアポッツプロ AirPodsPro2";
+    if (name === "Apple AirPods Pro 第2世代" && c2 === "Type-C") return "MTJV3J/A エアポッツプロ AirPodsPro2";
     if (name === "Apple AirPods 4") return "MXP63J/A エアポッツ AirPods4 エアポッズ";
     if (name === "Apple AirPods 4 ANC") return "MXP93J/A エアポッツ AirPods4 エアポッズ";
     if (cat === "watch") return "アップルウォッチ applewatch";
@@ -827,6 +894,29 @@ function autoGenerate() {
         
         titleLine = `Apple M1 MacBook Air Retina 13.3 ${modelNum} ${color} ${ramVal} ${ssdVal}`;
         bodyTitleLine = `Apple M1 MacBookAir 13インチ ${modelNum} ${color} ${ramVal} ${ssdVal} マックブック Mac`;
+    } else if (cat === "max") {
+        let modelNum = "";
+        if (pid === "15" && spec === "Lightning") {
+            if(color==="スペースグレイ") modelNum="MGYH3J/A";
+            if(color==="シルバー") modelNum="MGYJ3J/A";
+            if(color==="スカイブルー") modelNum="MGYL3J/A";
+            if(color==="グリーン") modelNum="MGYN3J/A";
+            if(color==="ピンク") modelNum="MGYM3J/A";
+        } else if (pid === "15" && spec === "Type-C") {
+            if(color==="ミッドナイト") modelNum="MWW43ZA/A";
+            if(color==="スターライト") modelNum="MWW53ZA/A";
+            if(color==="ブルー") modelNum="MWW63ZA/A";
+            if(color==="パープル") modelNum="MWW83ZA/A";
+            if(color==="オレンジ") modelNum="MWW73ZA/A";
+        } else if (pid === "16") {
+            if(color==="ミッドナイト") modelNum="MHWK4ZA/A";
+            if(color==="スターライト") modelNum="MHWL4ZA/A";
+            if(color==="ブルー") modelNum="MHWM4ZA/A";
+            if(color==="パープル") modelNum="MHWP4ZA/A";
+            if(color==="オレンジ") modelNum="MHWN4ZA/A";
+        }
+        titleLine = `${p.name} ${spec} ${color} ${modelNum} エアポッズマックス`;
+        bodyTitleLine = titleLine;
     } else {
         titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
         bodyTitleLine = titleLine;
@@ -913,7 +1003,7 @@ function autoGenerate() {
         
         const bVal = document.getElementById('battery').value;
         if(pid !== "11" && bVal) {
-            if(isAirPodsPro || pName === "Apple AirPods 4 ANC") {
+            if(isAirPodsPro || pName === "Apple AirPods 4 ANC" || cat === "max") {
                 bodyText += `・バッテリーは、10分の音楽再生（ANC）で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
             } else if(["5", "6"].includes(pid)) {
                 bodyText += `・バッテリーは、10分の音楽再生で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
@@ -935,7 +1025,7 @@ function autoGenerate() {
             initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
         } else if (cat === "macbook") {
             initMsg = "・初期化、アクティベーションロック／アカウント連携解除済み\n";
-        } else if (["5", "6", "7", "8"].includes(pid)) {
+        } else if (["5", "6", "7", "8"].includes(pid) || cat === "max") {
             initMsg = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
         } else {
             initMsg = "・本体のリセット済み\n";
