@@ -2,824 +2,1121 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="apple-mobile-web-app-title" content="商品登録">
+    <title>商品登録</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Line+Seed+JP:wght@100;400;700&display=swap" rel="stylesheet">
-
-    <link rel="icon" href="sd3.png" type="image/png">
-    <link rel="apple-touch-icon" href="sd3.png">
+    <link rel="icon" href="make2.png" type="image/png">
+    <link rel="apple-touch-icon" href="make2.png">
     
-    <title>利益計算 & 相場検索</title>
+    <link rel="stylesheet" href="https://static.line-scdn.net/lineseed-jp/edge/fonts.css">
     <style>
-        :root {
-            --bg-color: #f8f9fa;
-            --main-blue: #007aff;
-            --text-gray: #8e8e93;
-            --line-green: #06C755;
-            --line-red: #ff3b30;
-            --current-accent: var(--line-red); 
+        :root { 
+            --primary: #1c1c1e; 
+            --accent: #007AFF; 
+            --bg: #f5f5f7; 
+            --font-main: 'LINE Seed JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            --border-color: #e2e2e9; 
+            --error: #ff3b30; 
+            --btn-gray: #f2f2f7;
         }
-
-        body {
-            font-family: 'Line Seed JP', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #333;
+        body { 
+            font-family: var(--font-main); 
+            background: var(--bg); 
+            padding: 10px; 
+            color: #1c1c1e; 
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased; 
+            -webkit-text-size-adjust: 100%; 
+            text-size-adjust: 100%;
+            touch-action: manipulation;
         }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 24px 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04); 
         }
-
-        .tab-container {
-            display: flex;
-            background-color: #e5e5ea;
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 20px;
+        h1 { font-size: 1.1rem; text-align: center; margin-bottom: 12px; font-weight: 700; }
+        
+        .btn-reset { 
+            background: var(--error); color: white; width: 100%; padding: 14px; 
+            border: none; border-radius: 14px; font-size: 0.9rem; font-weight: 700; 
+            cursor: pointer; margin-bottom: 24px; transition: transform 0.1s;
         }
+        .btn-reset:active { transform: scale(0.98); opacity: 0.9; }
 
-        .tab-btn {
-            flex: 1;
-            text-align: center;
-            padding: 10px 0;
-            font-size: 14px;
-            font-weight: 700;
-            color: #8e8e93;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
+        .section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #eff0f6; }
+        .hidden { display: none !important; }
+        label { display: block; font-weight: 700; margin-bottom: 12px; font-size: 0.9rem; color: #4a4a4e; }
+        
+        select, input { 
+            font-family: var(--font-main); width: 100%; padding: 14px; border: 1.5px solid var(--border-color); 
+            border-radius: 12px; font-size: 1rem; box-sizing: border-box; margin-bottom: 12px; background: #fff; 
+            -webkit-appearance: none; appearance: none;
         }
-
-        .tab-btn.active {
-            background-color: white;
-            color: #000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        select:disabled { background-color: #f2f2f7; color: #8e8e93; opacity: 1; -webkit-text-fill-color: #8e8e93; }
+        
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .checkbox-item { 
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            padding: 12px 6px; min-height: 64px; background: var(--btn-gray); 
+            border: 1.5px solid var(--border-color); border-radius: 12px; cursor: pointer;
         }
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        .checkbox-item input { display: none; }
+        .checkbox-item:has(input:checked) { border-color: var(--accent); background: #e5f1ff; }
+        .checkbox-item:has(input:checked) .checkbox-label { color: var(--accent); font-weight: 700; }
+        .checkbox-label { font-size: 0.75rem; font-weight: 500; color: #1c1c1e; pointer-events: none; line-height: 1.4; }
+        
+        .checkbox-group-multi { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .checkbox-item-multi { 
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            padding: 8px 12px; background: var(--btn-gray); 
+            border: 1.5px solid var(--border-color); border-radius: 8px; cursor: pointer;
         }
+        .checkbox-item-multi input { display: none; }
+        .checkbox-item-multi:has(input:checked) { border-color: var(--accent); background: #e5f1ff; }
+        .checkbox-item-multi:has(input:checked) .checkbox-label-multi { color: var(--accent); font-weight: 700; }
+        .checkbox-label-multi { font-size: 0.75rem; font-weight: 500; color: #1c1c1e; pointer-events: none; }
 
-        h2 {
-            font-size: 18px;
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #000;
-            border-left: 5px solid var(--current-accent);
-            padding-left: 12px;
-            font-weight: 700;
-            transition: border-color 0.3s ease;
+        .sub-panel { background: #f4f4f9; padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid #e2e2e9; }
+        
+        button.btn-copy { 
+            font-family: var(--font-main); width: 100%; padding: 18px; border: none; border-radius: 14px; 
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s; margin-bottom: 12px;
         }
-
-        textarea.memo-input {
-            width: 100%;
-            height: 48px;
-            padding: 14px;
-            font-size: 14px;
-            font-family: inherit;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            box-sizing: border-box;
-            background-color: #fafafa;
-            resize: none;
-            -webkit-appearance: none;
-            overflow: hidden;
-            white-space: nowrap;
+        .btn-copy-title { background: #e2e2e9; color: #1c1c1e; }
+        .btn-copy-body { background: var(--primary); color: white; margin-top: 10px; }
+        
+        .output-wrapper { 
+            margin-top: 30px; border-top: 2px solid var(--bg); padding-top: 20px;
+            display: flex; flex-direction: column; align-items: center; 
         }
-
-        textarea.memo-input:focus {
-            outline: none;
-            border-color: var(--current-accent);
-            background-color: #fff;
+        .output-box { 
+            padding: 18px; background: #fff; color: #1c1c1e; font-family: var(--font-main); 
+            font-size: 0.85rem; white-space: pre-wrap; border-radius: 16px; 
+            border: 1.5px solid var(--border-color); margin-bottom: 8px; word-break: break-all; width: 100%; box-sizing: border-box;
         }
-
-        .row-flex {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 18px;
-            width: 100%;
-        }
-
-        .input-group {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .input-group-large {
-            flex: 1.5;
-        }
-
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #555;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        input[type="number"], select {
-            width: 100%;
-            padding: 14px;
-            font-size: 15px;
-            font-family: inherit;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            box-sizing: border-box;
-            background-color: #fafafa;
-            -webkit-appearance: none;
-            text-overflow: ellipsis;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--current-accent);
-            background-color: #fff;
-        }
-
-        .calc-display {
-            width: 100%;
-            padding: 14px 0;
-            font-size: 15px;
-            font-weight: 700;
-            color: #333;
-            text-align: center;
-            background-color: #f2f2f7;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            box-sizing: border-box;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #333;
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-            margin-top: 5px;
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .result-grid-2col {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .result-box {
-            background-color: #fafafa;
-            border: 1px solid #f0f0f0;
-            border-radius: 10px;
-            padding: 12px 5px;
-            text-align: center;
-        }
-
-        .result-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #666;
-            margin-bottom: 6px;
-        }
-
-        .profit-bold {
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .margin-normal {
-            font-size: 15px;
-            font-weight: 400;
-        }
-
-        .reset-btn {
-            width: 100%;
-            padding: 16px;
-            background-color: rgba(255, 59, 48, 0.8);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .reset-btn:active {
-            opacity: 0.8;
-            transform: scale(0.98);
-        }
-
-        #db-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 350px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .db-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--line-green);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            margin-top: 10px;
-            cursor: pointer;
+        #output-body { 
+            font-size: 13px; width: 325px; box-sizing: content-box; 
+            max-width: calc(100% - 32px); padding: 16px; margin-bottom: 8px; 
+            display: block; margin-left: auto; margin-right: auto;
         }
         
-        .cancel-btn {
-            flex: 1; 
-            padding: 16px;
-            background-color: transparent;
-            color: #8e8e93;
-            border: none;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
+        .output-label { font-size: 0.8rem; font-weight: 700; color: #8e8e93; margin-bottom: 6px; align-self: flex-start; }
+        .char-count { width: 100%; text-align: right; font-size: 0.75rem; color: #8e8e93; font-weight: 500; margin-bottom: 12px; }
+        .count-over { color: var(--error); font-weight: 700; }
+        .required { color: var(--error); margin-left: 4px; }
+        
+        #toast {
+            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8); color: white; padding: 12px 24px;
+            border-radius: 25px; font-size: 0.9rem; font-weight: 700;
+            z-index: 9999; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
         }
+        #toast.show { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
-    <div class="tab-container">
-        <div class="tab-btn active" id="tab-market" onclick="switchMode('market')">相場検索</div>
-        <div class="tab-btn" id="tab-calc" onclick="switchMode('calc')">利益計算</div>
+    <h1>商品登録</h1>
+    <button class="btn-reset" onclick="resetAll()">すべてをリセット</button>
+
+    <div class="section">
+        <label>商品名 <span class="required">*</span></label>
+        <select id="productId" onchange="resetAndFillUI(); autoGenerate();"></select>
     </div>
 
-    <div id="mode-market" style="display: block;">
-        <div class="card">
-            <h2>製品情報</h2>
-            <div class="row-flex">
-                <div class="input-group-large">
-                    <label>製品名</label>
-                    <select id="market-product" onchange="loadSavedShipping(); calculateMarket();">
-                        <option value="0">選択してください</option>
-                        <option value="Apple Watch SE 第2世代">Apple Watch SE 第2世代</option>
-                        <option value="Apple Watch SE 第3世代">Apple Watch SE 第3世代</option>
-                        <option value="Apple Watch Series10">Apple Watch Series10</option>
-                        <option value="Apple Watch Series11">Apple Watch Series11</option>
-                        <option value="AirPods Pro">AirPods Pro</option>
-                        <option value="AirPods Pro 2">AirPods Pro 2</option>
-                        <option value="AirPods Pro 3">AirPods Pro 3</option>
-                        <option value="AirPods 4">AirPods 4</option>
-                        <option value="AirPods 4 ANC">AirPods 4 ANC</option>
-                        <option value="Apple Pencil">Apple Pencil</option>
-                        <option value="Apple Pencil 第2世代">Apple Pencil 第2世代</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>モデル</label>
-                    <select id="market-model" onchange="loadSavedShipping(); calculateMarket();">
-                        <option value="0">-</option>
-                        <option value="40">40</option>
-                        <option value="42">42</option>
-                        <option value="44">44</option>
-                        <option value="46">46</option>
-                        <option value="Lightning">Lightning</option>
-                        <option value="Type-C">Type-C</option>
-                        <option value="64GB">64GB</option>
-                        <option value="128GB">128GB</option>
-                        <option value="256GB">256GB</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row-flex">
-                <div class="input-group">
-                    <label>カラー</label>
-                    <select id="market-color" onchange="loadSavedShipping(); calculateMarket();">
-                        <option value="ー">ー</option>
-                        <option value="ミッドナイト">ミッドナイト</option>
-                        <option value="スターライト">スターライト</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>状態</label>
-                    <select id="market-condition" onchange="loadSavedShipping(); calculateMarket();">
-                        <option value="0">選択</option>
-                        <option value="中古">中古</option>
-                        <option value="新品">新品</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row-flex" style="margin-bottom:0;">
-                <div class="input-group">
-                    <label>配送方法</label>
-                    <select id="market-shipping-method" onchange="calculateMarket()">
-                        <option value="0">選択してください</option>
-                        <optgroup label="郵便局">
-                            <option value="180">ゆうパケットポストmini</option>
-                            <option value="215">ゆうパケットポスト</option>
-                            <option value="475">ゆうパケットプラス</option>
-                        </optgroup>
-                        <optgroup label="ヤマト運輸">
-                            <option value="210">ネコポス</option>
-                            <option value="560">宅急便コンパクト</option>
-                            <option value="750">宅急便（60）</option>
-                            <option value="850">宅急便（80）</option>
-                            <option value="1050">宅急便（100）</option>
-                            <option value="1200">宅急便（120）</option>
-                            <option value="1400">宅急便（140）</option>
-                            <option value="1700">宅急便（160）</option>
-                            <option value="2100">宅急便（200）</option>
-                        </optgroup>
-                    </select>
-                </div>
-            </div>
+    <div class="section">
+        <div id="wrapperCharging" class="hidden">
+            <label>充電方式 <span class="required">*</span></label>
+            <select id="chargingMethod" onchange="autoGenerate()"></select>
         </div>
-
-        <div class="card">
-            <h2>相場検索結果</h2>
-            <div class="row-flex" style="align-items: flex-end; margin-bottom: 20px;">
-                <div class="input-group-large">
-                    <label>目標仕入額</label>
-                    <div class="calc-display" id="market-target-cost" style="color: var(--line-red); font-size: 18px;">-</div>
-                </div>
-            </div>
-            <div class="section-title">販売想定</div>
-            <div class="result-grid-2col">
-                <div class="result-box">
-                    <div class="result-label">最安値</div>
-                    <div class="profit-bold" style="color: var(--main-blue);" id="market-sale-min">-</div>
-                </div>
-                <div class="result-box">
-                    <div class="result-label">最高値</div>
-                    <div class="profit-bold" style="color: var(--main-blue);" id="market-sale-max">-</div>
-                </div>
-            </div>
-            <div class="section-title">想定利益</div>
-            <div class="result-grid-2col" style="margin-bottom: 0;">
-                <div class="result-box">
-                    <div class="result-label">最安値での利益</div>
-                    <div class="profit-bold" style="color: #333;" id="market-profit-min">-</div>
-                    <div class="margin-normal" style="color: var(--text-gray); font-size:12px;" id="market-margin-min">-</div>
-                </div>
-                <div class="result-box">
-                    <div class="result-label">最高値での利益</div>
-                    <div class="profit-bold" style="color: #333;" id="market-profit-max">-</div>
-                    <div class="margin-normal" style="color: var(--text-gray); font-size:12px;" id="market-margin-max">-</div>
-                </div>
-            </div>
+        <div id="wrapperSpec" class="hidden">
+            <label id="labelSpec">スペック <span class="required">*</span></label>
+            <select id="spec" onchange="updateUI(); autoGenerate();"></select>
         </div>
-
-        <div class="row-flex" style="margin-bottom: 0; margin-top: 10px;">
-            <button class="reset-btn" style="margin-top: 0; background-color: rgba(142, 142, 147, 0.6);" onclick="resetMarket()">リセット</button>
-            <button class="reset-btn" style="margin-top: 0;" onclick="openDbModal()">登録</button>
+        <div id="wrapperSize" class="hidden">
+            <label>サイズ <span class="required">*</span></label>
+            <select id="size" onchange="autoGenerate()"></select>
+        </div>
+        <div id="wrapperRam" class="hidden">
+            <label>RAM <span class="required">*</span></label>
+            <select id="ram" onchange="autoGenerate()"></select>
+        </div>
+        <div id="wrapperSsd" class="hidden">
+            <label>SSD <span class="required">*</span></label>
+            <select id="ssd" onchange="autoGenerate()"></select>
+        </div>
+        <div id="wrapperColor" class="hidden">
+            <label>カラー <span class="required">*</span></label>
+            <select id="color" onchange="updateUI(); autoGenerate();"></select>
         </div>
     </div>
 
-    <div id="mode-calc" style="display: none;">
-        <div class="card">
-            <h2>メモ</h2>
-            <textarea id="calc-memo" class="memo-input" placeholder="商品名や特記事項など" rows="1"></textarea>
-        </div>
-        <div class="card">
-            <h2>利益計算</h2>
-            <div class="row-flex">
-                <div class="input-group">
-                    <label>仕入値 (円)</label>
-                    <input type="number" id="calc-cost-price" inputmode="numeric" placeholder="0" oninput="calculateCalc()">
-                </div>
-                <div class="input-group">
-                    <label>配送方法</label>
-                    <select id="calc-shipping-method" onchange="calculateCalc()">
-                        <option value="0">選択してください</option>
-                        <optgroup label="郵便局">
-                            <option value="180">ゆうパケットポストmini</option>
-                            <option value="215">ゆうパケットポスト</option>
-                            <option value="475">ゆうパケットプラス</option>
-                        </optgroup>
-                        <optgroup label="ヤマト運輸">
-                            <option value="210">ネコポス</option>
-                            <option value="560">宅急便コンパクト</option>
-                            <option value="750">宅急便（60）</option>
-                            <option value="850">宅急便（80）</option>
-                            <option value="1050">宅急便（100）</option>
-                            <option value="1200">宅急便（120）</option>
-                            <option value="1400">宅急便（140）</option>
-                            <option value="1700">宅急便（160）</option>
-                            <option value="2100">宅急便（200）</option>
-                        </optgroup>
-                    </select>
-                </div>
-            </div>
-            <div class="row-flex" style="align-items: flex-end; margin-bottom: 0;">
-                <div class="input-group-large">
-                    <label>最低売値 (円)</label>
-                    <input type="number" id="calc-sale-price" inputmode="numeric" placeholder="0" oninput="calculateCalc()">
-                </div>
-                <div class="input-group">
-                    <label>5%</label>
-                    <div class="calc-display" id="calc-sale-5-display">-</div>
-                </div>
-                <div class="input-group">
-                    <label>7%</label>
-                    <div class="calc-display" id="calc-sale-7-display">-</div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <h2>計算結果</h2>
-            <div class="section-title">利益</div>
-            <div class="result-grid">
-                <div class="result-box">
-                    <div class="result-label">最低売値</div>
-                    <div class="profit-bold" style="color: var(--main-blue);" id="calc-profit-min">0 円</div>
-                </div>
-                <div class="result-box">
-                    <div class="result-label">5%</div>
-                    <div class="profit-bold" style="color: var(--main-blue);" id="calc-profit-5">0 円</div>
-                </div>
-                <div class="result-box">
-                    <div class="result-label">7%</div>
-                    <div class="profit-bold" style="color: var(--main-blue);" id="calc-profit-7">0 円</div>
-                </div>
-            </div>
-            <div class="section-title">利益率</div>
-            <div class="result-grid" style="margin-bottom: 0;">
-                <div class="result-box">
-                    <div class="result-label">最低売値</div>
-                    <div class="margin-normal" style="color: var(--text-gray);" id="calc-margin-min">0 ％</div>
-                </div>
-                <div class="result-box">
-                    <div class="result-label">5%</div>
-                    <div class="margin-normal" style="color: var(--text-gray);" id="calc-margin-5">0 ％</div>
-                </div>
-                <div class="result-box">
-                    <div class="result-label">7%</div>
-                    <div class="margin-normal" style="color: var(--text-gray);" id="calc-margin-7">0 ％</div>
-                </div>
-            </div>
-        </div>
-        <button class="reset-btn" onclick="resetCalc()">すべてリセット</button>
-    </div>
-</div>
-
-<div id="db-modal">
-    <div class="modal-content">
-        <h2 style="border-left-color: var(--line-red);">相場データ登録</h2>
-        <p style="font-size:12px; color:#666; margin-bottom:15px;">最低1件から登録可能。配送方法も初期値として保存されます。</p>
+    <div class="section">
+        <label>同梱物 <span class="required">*</span></label>
+        <div id="accessoriesGroup" class="checkbox-group"></div>
         
-        <div class="input-group" style="margin-bottom:10px;">
-            <select id="db-product"><option value="0">製品名を選択</option></select>
-        </div>
-        <div class="row-flex" style="margin-bottom:10px;">
-            <div class="input-group">
-                <select id="db-model"><option value="0">モデル選択</option></select>
-            </div>
-            <div class="input-group">
-                <select id="db-color"><option value="ー">カラー選択 (ー)</option></select>
-            </div>
-        </div>
-        <div class="row-flex" style="margin-bottom:15px;">
-            <div class="input-group">
-                <select id="db-condition">
-                    <option value="0">状態を選択</option>
-                    <option value="中古">中古</option>
-                    <option value="新品">新品</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <select id="db-shipping"><option value="0">配送方法</option></select>
-            </div>
+        <div id="bandDetails" class="sub-panel hidden">
+            <label>バンドサイズ <span class="required">*</span></label>
+            <select id="bandSize" onchange="autoGenerate()">
+                <option value="">選択してください</option>
+                <option value="S／M">S／M</option>
+                <option value="M／L">M／L</option>
+            </select>
+            
+            <label>バンドカラー</label>
+            <input type="text" id="bandColor" oninput="autoGenerate()" placeholder="例：ミッドナイト">
+            
+            <label>バンド状態 <span class="required">*</span></label>
+            <select id="bandCondition" onchange="autoGenerate()">
+                <option value="">選択してください</option>
+                <option value="使用感がほとんどない未使用に近いものです。">未使用に近い</option>
+                <option value="裏面にスレがありますが黄ばみやベタつき、致命傷はありません。">微スレあり・致命傷なし</option>
+                <option value="使用感はありますが、問題なく着用可能です。">使用感あり・着用可能</option>
+            </select>
         </div>
 
-        <div class="db-grid">
-            <div class="input-group"><input type="number" id="db-price1" inputmode="numeric" placeholder="実績1 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price2" inputmode="numeric" placeholder="実績2 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price3" inputmode="numeric" placeholder="実績3 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price4" inputmode="numeric" placeholder="実績4 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price5" inputmode="numeric" placeholder="実績5 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price6" inputmode="numeric" placeholder="実績6 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price7" inputmode="numeric" placeholder="実績7 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price8" inputmode="numeric" placeholder="実績8 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price9" inputmode="numeric" placeholder="実績9 (円)"></div>
-            <div class="input-group"><input type="number" id="db-price10" inputmode="numeric" placeholder="実績10 (円)"></div>
-        </div>
-
-        <button class="save-btn" onclick="saveToDb()">登録して上書きする</button>
-        <div class="row-flex" style="margin-top: 5px; margin-bottom: 0;">
-            <button class="cancel-btn" onclick="resetDbModal()">リセット</button>
-            <button class="cancel-btn" onclick="closeDbModal()">キャンセル</button>
+        <div id="eartipDetails" class="sub-panel hidden">
+            <label>イヤーチップサイズ <span class="required">*</span></label>
+            <div id="eartipSizeGroup" class="checkbox-group-multi"></div>
         </div>
     </div>
+
+    <div class="section">
+        <label>外観状態 <span class="required">*</span></label>
+        <select id="condition" onchange="updateUI(); autoGenerate();">
+            <option value="">選択してください</option>
+            <option value="未開封の「新品／未使用」状態">未開封の「新品／未使用」状態</option>
+            <option value="使用感が少ない「未使用に近い」状態">使用感が少ない「未使用に近い」状態</option>
+            <option value="目立つ傷、スレがない「とても良好」な状態">目立つ傷、スレがない「とても良好」な状態</option>
+            <option value="小傷、微スレありますが「致命傷のない」状態">小傷、微スレありますが「致命傷のない」状態</option>
+            <option value="傷、スレありますが「十分に使用可能」な状態">傷、スレありますが「十分に使用可能」な状態</option>
+        </select>
+        
+        <div id="appearancePanel">
+            <div id="boxA">
+                <label id="labelA">詳細A <span class="required">*</span></label>
+                <select id="detailA" onchange="autoGenerate()"></select>
+            </div>
+            <div id="boxB">
+                <label id="labelB">詳細B <span class="required">*</span></label>
+                <select id="detailB" onchange="autoGenerate()"></select>
+            </div>
+            <div id="boxC">
+                <label id="labelC">詳細C <span class="required">*</span></label>
+                <select id="detailC" onchange="autoGenerate()"></select>
+            </div>
+            <div id="boxD" class="hidden">
+                <label id="labelD">詳細D <span class="required">*</span></label>
+                <select id="detailD" onchange="autoGenerate()">
+                    </select>
+            </div>
+        </div>
+        
+        <label style="margin-top:10px;">外観備考</label>
+        <input type="text" id="appearanceNotes" oninput="autoGenerate()" placeholder="例：液晶保護フィルム貼付済み">
+    </div>
+
+    <div class="section">
+        <div id="wrapperBattery">
+            <label id="batteryLabel">バッテリー最大容量 (%) <span class="required">*</span></label>
+            <input type="number" id="battery" oninput="autoGenerate()" placeholder="0-100" inputmode="numeric" pattern="[0-9]*">
+        </div>
+        
+        <div id="wrapperBatteryType" class="hidden">
+            <label>バッテリー交換履歴 <span class="required">*</span></label>
+            <select id="batteryType" onchange="autoGenerate()">
+                <option value="">選択してください</option>
+                <option value="※Apple純正バッテリー">Apple純正バッテリー</option>
+                <option value="※総務省登録修理店にて交換済みの他社バッテリー">登録修理店での交換（他社製）</option>
+            </select>
+        </div>
+        
+        <div id="wrapperIMEI" class="hidden">
+            <label>IMEI <span class="required">*</span></label>
+            <input type="text" id="imei" oninput="autoGenerate()" placeholder="IMEI番号を入力">
+        </div>
+        
+        <div id="wrapperNet" class="hidden">
+            <label id="labelNet">ネットワーク利用制限 <span class="required">*</span></label>
+            <select id="netRestriction" onchange="autoGenerate()">
+                <option value="">選択してください</option>
+                <option value="-">-</option>
+                <option value="○">○</option>
+            </select>
+        </div>
+        
+        <label>保証</label>
+        <select id="warranty" onchange="autoGenerate()">
+            <option value="">選択なし</option>
+            <option value="Apple Care Service">Apple Care Service</option>
+            <option value="AppleCare+">AppleCare+</option>
+            <option value="Apple製品限定保証">Apple製品限定保証</option>
+        </select>
+    </div>
+    
+    <div class="section">
+        <label>配送ランク <span class="required">*</span></label>
+        <select id="shippingRank" onchange="autoGenerate()"></select>
+    </div>
+
+    <div id="output-wrapper" class="output-wrapper hidden">
+        <span class="output-label">タイトル</span>
+        <div id="output-title" class="output-box"></div>
+        <button class="btn-copy btn-copy-title" onclick="processCopy('title')">タイトルをコピー</button>
+        <div id="title-char-count" class="char-count">タイトル: 0/65</div>
+        
+        <span class="output-label">本文</span>
+        <div id="output-body" class="output-box"></div>
+        <div id="body-char-count" class="char-count">本文: 0/1000</div>
+        <button class="btn-copy btn-copy-body" onclick="processCopy('body')">本文をコピー</button>
+    </div>
 </div>
+
+<div id="toast"></div>
 
 <script>
-    // --- データベース管理 ---
-    let marketDB = JSON.parse(localStorage.getItem('marketDB')) || {};
-
-    function generateDbKey(product, model, color, condition) {
-        return `${product}_${model}_${color}_${condition}`;
+// ピンチズームの防止
+document.addEventListener('touchmove', function (event) {
+    if (event.touches.length > 1) {
+        event.preventDefault();
     }
+}, { passive: false });
 
-    // --- モード切り替え ---
-    function switchMode(mode) {
-        document.getElementById('tab-calc').classList.remove('active');
-        document.getElementById('tab-market').classList.remove('active');
-        document.getElementById('mode-calc').style.display = 'none';
-        document.getElementById('mode-market').style.display = 'none';
+// ダブルタップズームの防止
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
 
-        if (mode === 'calc') {
-            document.getElementById('tab-calc').classList.add('active');
-            document.getElementById('mode-calc').style.display = 'block';
-            document.documentElement.style.setProperty('--current-accent', 'var(--line-green)');
-        } else {
-            document.getElementById('tab-market').classList.add('active');
-            document.getElementById('mode-market').style.display = 'block';
-            document.documentElement.style.setProperty('--current-accent', 'var(--line-red)');
-            calculateMarket();
+// 製品マスターデータ
+const PRODUCTS = { 
+    "1": { name: "Apple Watch SE 第2世代", cat: "watch" }, 
+    "2": { name: "Apple Watch SE 第3世代", cat: "watch" }, 
+    "3": { name: "Apple Watch Series 10", cat: "watch" }, 
+    "4": { name: "Apple Watch Series 11", cat: "watch" }, 
+    "5": { name: "Apple AirPods 4", cat: "airpods" }, 
+    "6": { name: "Apple AirPods 4 ANC", cat: "airpods" }, 
+    "7": { name: "Apple AirPods Pro 第2世代", cat: "airpods" }, 
+    "8": { name: "Apple AirPods Pro 第3世代", cat: "airpods" }, 
+    "9": { name: "Apple Pencil 第1世代", cat: "pencil" }, 
+    "10": { name: "Apple Pencil 第2世代", cat: "pencil" }, 
+    "11": { name: "Apple HomePod mini", cat: "homepod" }, 
+    "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" }, 
+    "13": { name: "Apple iPhone13 mini", cat: "iphone" },
+    "14": { name: "MacBook Air 13.3 M1", cat: "macbook" },
+    "15": { name: "Apple AirPods Max（第1世代）", cat: "max" },
+    "16": { name: "Apple AirPods Max（第2世代）", cat: "max" }
+};
+
+const MASTER = {
+    specs: { 
+        "1": ["GPS", "GPS Cellular"], "2": ["GPS", "GPS Cellular"], "3": ["GPS", "GPS Cellular"], "4": ["GPS", "GPS Cellular"], 
+        "7": ["Lightning", "Type-C"], "13": ["64GB", "128GB", "256GB"], "15": ["Lightning", "Type-C"], "16": ["Type-C"]
+    },
+    rams: { "14": ["8GB", "16GB", "32GB"] },
+    ssds: { "14": ["128GB", "256GB", "512GB"] },
+    charging: { "12": ["Lightning", "Type-C"] }, 
+    sizes: { 
+        "1": ["40mm", "44mm"], "2": ["40mm", "44mm"], "3": ["42mm", "46mm"], "4": ["42mm", "46mm"] 
+    },
+    colors: { 
+        "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], 
+        "11": ["ホワイト", "スペースグレイ", "ブルー", "オレンジ", "イエロー", "ミッドナイト"], "12": ["ホワイト", "ブラック"], "13": ["スターライト", "レッド", "ミッドナイト", "ブルー", "ピンク", "グリーン"],
+        "14": ["スペースグレイ", "シルバー", "ゴールド"]
+    },
+    shipping: { 
+        "A": { label: "A - ゆうパケット（送料無料）", text: "■ゆうパケット（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：不可\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※変更を希望される場合は、購入前にご申告ください。" }, 
+        "B": { label: "B - ネコポス（送料無料）", text: "■ネコポス（送料無料）\n・日時指定／コンビニ受取：不可\n・置き配：可能\n\n■宅急便コンパクト（＋350円）\n・日時指定／コンビニ受取：可能\n・置き配：可能\n\n※配送日数に違いはありません。\n※変更を希望される場合は、購入前にご申告ください。" },
+        "C": { label: "C - 宅急便コンパクト（送料無料）", text: "■宅急便コンパクト（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" }, 
+        "D": { label: "D - 宅急便（送料無料）", text: "■宅急便（送料無料）\n・日時指定／コンビニ受取（可）\n・置き配（可）" } 
+    },
+    accs: [
+        "シリコンバンド（未使用／互換品）", 
+        "スポーツバンド（アップル純正）", 
+        "充電ケーブル（未使用／互換品）", 
+        "充電ケーブル（アップル純正）", 
+        "充電ケース",
+        "イヤーチップ", 
+        "イヤーカップ（左右）",
+        "ヘッドフォンカバー（アップル純正）",
+        "ACアダプター", 
+        "電源ケーブル", 
+        "SIMピン", 
+        "新品同梱品と同じ", 
+        "外箱", 
+        "外箱／リーフレット"
+    ],
+    eartipSizes: ["XS", "S", "M", "L", "未使用／互換品"],
+    details: { 
+        watch: { 
+            A: [
+                "画面は肉眼でわかる傷、スレ、割れはありません。", 
+                "画面は肉眼では気にならない程度の薄いスレがありますが、点灯時に目につく程の大きな傷はありません。", 
+                "画面は浅めの傷やスレがありますが、1mm以上の目立つ傷はなく、操作性や視認性に影響はありません。",
+                "画面は線状のスレがありますが、点灯時に視認性を低下させる程の目立つ傷はありません。"
+            ], 
+            B: [
+                "側面は肉眼でわかる傷、スレ、剥げはありません。", 
+                "側面は微細な剥げがありますが、1mm以上の目立つ傷はありません。", 
+                "側面は浅め傷やスレがありますが、1mm以上の目立つ傷はありません。", 
+                "デジタルクラウンに微細な剥げがありますが、操作性に影響はありません。"
+            ], 
+            C: [
+                "背面は目立つ傷、スレ、剥げなどはなく使用感は少なめです。", 
+                "背面に微細な剥げがありますが、装着時には気にならない箇所で、大きな傷はありません。", 
+                "背面に細かいスレ、ベルト接続部に剥げがありますが、装着時には気にならない箇所で、1mm以上の大きな傷はありません。", 
+                "背面は線状のスレや微細な剥げがありますが、装着時には気にならない箇所で、目立つ傷はありません。",
+                "ベルト接続部に微細な剥げがありますが、装着時には気にならない箇所で、他に目立つ傷はありません。"
+            ] 
+        }, 
+        audio: { 
+            A: [
+                "ケース外装は、肉眼でわかる傷、スレ、汚れがほとんどありません。", 
+                "ケース外装は、浅い傷や微細なスレがありますが、1mm以上の打痕や目立つ傷はありません。", 
+                "ケース外装は、線状の細かいスレがありますが、深く目立つ傷はありません。",
+                "ケース外装は、浅い傷やスレ等、やや使用感がありますが、1mm以上の大きな打痕や傷はありません。"
+            ], 
+            B: [
+                "ケース内側は、肉眼でわかる傷、スレ、汚れがほとんどありません。", 
+                "ケース内側は、細かいスレや汚れ等がありますが、比較的良好な状態です。", 
+                "ケース内側は、細かいスレや汚れ等、やや使用感がありますが目立つ傷はありません。",
+                "ケース内側は、やや使用感がありますが、使用に影響が出る損傷等はありません。"
+            ], 
+            C: [
+                "イヤホン本体は、肉眼でわかる傷、スレ、汚れがほとんどありません。", 
+                "イヤホン本体は、浅い傷や微細なスレがありますが1mm以上の大きな傷はありません。", 
+                "イヤホン本体は、浅い傷やスレ等、やや使用感がありますが使用に影響が出る損傷等はありません。"
+            ],
+            D: [
+                "イヤーチップは、劣化や使用感がほとんどない良好な状態です。",
+                "イヤーチップは、やや使用感がありますが、使用に影響する程の劣化はありません、",
+                "イヤーチップは、使用感がありますが、問題なく使用可能です。"
+            ]
+        }, 
+        max: {
+            A: [
+                "外装は肉眼でわかる傷、スレ、汚れがほとんどありません。",
+                "外装は微細なスレや剥げがありますが、1mm以上の目立つ傷や打痕はありません。",
+                "外装は線状のスレ、微細な傷等がありますが、1mm以上の目立つ傷はありません。",
+                "外装は浅い傷やスレ、使用感がありますが使用に影響する程の深い傷はありません。"
+            ],
+            B: [
+                "ヘッドバンドは肉眼でわかる傷や汚れ、破れやたわみ等の劣化はほとんどありません。",
+                "ヘッドバンドは浅い傷や微細なスレがありますが、破れはなく、たわみ等の劣化も少なく、比較的良好です。",
+                "ヘッドバンドは浅い傷や微細なスレ、たわみ等、やや使用感がありますが、使用に影響がある破れや損傷はありません。"
+            ],
+            C: [
+                "イヤーカップは肉眼でわかる傷や汚れ、破れ等の劣化はほとんどありません。",
+                "イヤーカップは浅い傷や微細なスレがありますが、破れはなく比較的良好です。",
+                "イヤーカップは浅い傷や微細なスレ等、やや使用感がありますが、使用に影響がある破れや損傷はありません。"
+            ],
+            D: [
+                "ケースは肉眼でわかる傷、スレ、汚れがほとんどありません。",
+                "ケースは微細なスレ等はありますが、目立つ汚れや劣化は少なめで比較的良好です。",
+                "ケースは微細なスレ等があり、やや経年劣化を感じる箇所もありますが、目立つ損傷や激しく劣化した部分はありません。",
+                "ケースはスレ等があり、経年劣化を感じる箇所もありますが、致命的な劣化はない為、問題なく使用可能です。"
+            ]
+        },
+        homepod: { 
+            A: [
+                "パネル面は肉眼でわかる傷、スレ、割れはありません。", 
+                "パネル面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", 
+                "パネル面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"
+            ], 
+            B: [
+                "側面は肉眼でわかる傷、スレ、割れはありません。", 
+                "側面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", 
+                "側面は浅めの傷やスレがありますが、使用に影響はありません。"
+            ], 
+            C: [
+                "底面は肉眼でわかる傷、スレ、割れはありません。", 
+                "底面は肉眼では気にならない程度の薄いスレがありますが、目立つ傷はありません。", 
+                "底面は浅めの傷やスレがありますが、使用に影響はありません。"
+            ] 
+        }, 
+        trackpad: { 
+            A: [
+                "操作面は肉眼でわかる傷、スレ、汚れがほとんどありません。", 
+                "操作面は微細なスレやわずかな使用感はありますが、比較的キレイな状態です。", 
+                "操作面は細かい傷やスレがありますが、操作性には影響ありません。"
+            ], 
+            B: [
+                "底面は肉眼でわかる傷、スレ、汚れ、ゴムの劣化がほとんどありません。", 
+                "底面は薄い汚れやスレ等はありますが、目立つ傷はなくゴムの劣化も少なめです。", 
+                "底面はややスレや汚れ、ゴムに劣化がありますが使用には影響ありません。"
+            ], 
+            C: [
+                "側面は肉眼でわかる傷、スレ、汚れはほとんどありません。", 
+                "側面は薄い汚れやスレ等はありますが、目立つ傷はありません。", 
+                "側面は細かい傷やスレがありますが、使用には問題ありません。"
+            ] 
+        },
+        iphone: {
+            A: [
+                "画面は肉眼でわかる傷、スレ、割れはありません。", 
+                "画面は薄いスレがありますが、目立つ傷はありません。", 
+                "画面は浅めの傷やスレがありますが、操作性や視認性に影響はありません。"
+            ],
+            B: [
+                "側面は肉眼でわかる傷、スレ、剥げはありません。", 
+                "側面は細かいスレ、剥げ等はありますが、1mm以上の目立つ傷はありません。", 
+                "側面は細かいスレがありますが、1mm以上の目立つ傷はありません。", 
+                "側面はスレや小傷がありますが、1mm以上の深い傷はありません。",
+                "側面はスレや剥げ等がありますが、使用に影響する程の深い傷はありません。"
+            ],
+            C: [
+                "背面は目立つ傷、スレ、剥げ等はなく使用感は少なめです。", 
+                "背面は薄いスレ、剥げ等はありますが1mm以上の目立つ傷はありません。", 
+                "背面は薄いスレや小傷がありますが、1mm以上の目立つ傷はありません。", 
+                "背面は薄いスレ、カメラレンズに剥げがありますが、他の部分には1mm以上の目立つ傷等はありません。"
+            ]
+        },
+        macbook: {
+            A: [
+                "画面は肉眼でわかる傷、スレ、割れはなくドット抜け等もありません。",
+                "画面は細かいスレはありますが目立つ傷や、ドット抜け等はありません。",
+                "画面は線状のスレがあり、使用感がややありますがドット抜け等はなく視認性に影響もありません。"
+            ],
+            B: [
+                "キーボード、トラックパッドは肉眼でわかる傷、スレ、印字かすれ、キーのたわみ等がなく使用感は少なめです。",
+                "キーボード、トラックパッドは細かいスレはありますが、目立つ傷、印字かすれ、キーのたわみ等はありません。",
+                "キーボード、トラックパッドは細かいスレや小傷はありますが、1mm以上の目立つ傷、印字かすれやキーのたわみはなく、使用に影響はありません。",
+                "キーボード、トラックパッドは細かいスレや小傷があり、やや使用感がありますが、1mm以上の目立つ傷はなく、問題なく使用できます。"
+            ],
+            C: [
+                "天板、側面、底面は目立つ傷、スレ、剥げ等はなく、ゴム足の劣化を含め使用感は少なめです。",
+                "天板、側面、底面は薄いスレ、剥げ等はありますがゴム足の劣化は少なく、目立つ傷もありません。",
+                "天板、側面、底面は薄いスレや小傷がありますが、1mm以上の目立つ傷はなく、ゴム足の劣化も少なめです。",
+                "天板、側面、底面は薄いスレや小傷があり、ややゴム足の劣化がありますが、1mm以上の目立つ傷はなく、使用に影響が出る程の劣化はなく、問題なく使用可能です。"
+            ]
         }
     }
+};
 
-    // ==============================================
-    // 利益計算モードのロジック
-    // ==============================================
-    function calculateCalc() {
-        const costPrice = parseFloat(document.getElementById('calc-cost-price').value) || 0;
-        const shippingCost = parseFloat(document.getElementById('calc-shipping-method').value) || 0;
-        const minSalePrice = parseFloat(document.getElementById('calc-sale-price').value) || 0;
-        
-        let startingPrice = 0;
-        let fleaMarket5PercentOff = 0;
-
-        if (minSalePrice > 0) {
-            const roundingUnit = minSalePrice >= 1000 ? 100 : 10;
-            const baseCalc = (minSalePrice - roundingUnit) / 0.93;
-            startingPrice = Math.floor(baseCalc / 10) * 10 + 10;
-
-            const discounted5 = startingPrice * 0.95;
-            if (roundingUnit === 100) {
-                fleaMarket5PercentOff = Math.ceil(discounted5 / 100) * 100;
-            } else {
-                fleaMarket5PercentOff = Math.ceil(discounted5 / 10) * 10;
-            }
-        }
-
-        document.getElementById('calc-sale-7-display').innerText = startingPrice > 0 ? startingPrice.toLocaleString() : "-";
-        document.getElementById('calc-sale-5-display').innerText = fleaMarket5PercentOff > 0 ? fleaMarket5PercentOff.toLocaleString() : "-";
-
-        function getMetrics(price) {
-            if (price === 0) return { profit: 0, margin: 0 };
-            const fee = Math.floor(price * 0.05);
-            const profit = price - costPrice - fee - shippingCost;
-            const margin = Math.floor((profit / price) * 100);
-            return { profit, margin };
-        }
-
-        const metricsMin = getMetrics(minSalePrice);
-        const metrics5 = getMetrics(fleaMarket5PercentOff);
-        const metrics7 = getMetrics(startingPrice);
-
-        document.getElementById('calc-profit-min').innerText = metricsMin.profit.toLocaleString() + " 円";
-        document.getElementById('calc-profit-5').innerText = metrics5.profit.toLocaleString() + " 円";
-        document.getElementById('calc-profit-7').innerText = metrics7.profit.toLocaleString() + " 円";
-        document.getElementById('calc-margin-min').innerText = metricsMin.margin + " ％";
-        document.getElementById('calc-margin-5').innerText = metrics5.margin + " ％";
-        document.getElementById('calc-margin-7').innerText = metrics7.margin + " ％";
-    }
-
-    function resetCalc() {
-        document.getElementById('calc-memo').value = '';
-        document.getElementById('calc-cost-price').value = '';
-        document.getElementById('calc-shipping-method').selectedIndex = 0;
-        document.getElementById('calc-sale-price').value = '';
-        calculateCalc();
-    }
-
-    // ==============================================
-    // 相場検索モードのロジック
-    // ==============================================
+function init() {
+    const pSel = document.getElementById('productId'); 
+    pSel.innerHTML = '<option value="">選択してください</option>';
     
-    // 追加: 配送方法の初期値をロードする関数
-    function loadSavedShipping() {
-        const product = document.getElementById('market-product').value;
-        const model = document.getElementById('market-model').value;
-        const color = document.getElementById('market-color').value;
-        const condition = document.getElementById('market-condition').value;
-
-        if (product === "0" || condition === "0") return;
-
-        const dbKey = generateDbKey(product, model, color, condition);
-        const marketData = marketDB[dbKey];
-
-        if (marketData && marketData.shipping) {
-            // 保存された配送方法をセレクトボックスに反映（あくまでも初期値）
-            document.getElementById('market-shipping-method').value = marketData.shipping;
+    // 表示順の指定
+    const order = ["1", "2", "3", "4", "5", "6", "7", "8", "15", "16", "9", "10", "11", "12", "13", "14"];
+    order.forEach(id => {
+        const p = PRODUCTS[id];
+        if (p) {
+            pSel.innerHTML += `<option value="${id}">${p.name}</option>`;
         }
-    }
-
-    function calculateMarket() {
-        const product = document.getElementById('market-product').value;
-        const model = document.getElementById('market-model').value;
-        const color = document.getElementById('market-color').value;
-        const condition = document.getElementById('market-condition').value;
-        const shippingSelect = document.getElementById('market-shipping-method');
-        const shippingCost = parseFloat(shippingSelect.value);
+    });
+    
+    const accGroup = document.getElementById('accessoriesGroup'); 
+    accGroup.innerHTML = '';
+    
+    MASTER.accs.forEach(a => {
+        let displayLabel = a;
+        if (a === "シリコンバンド（未使用／互換品）") {
+            displayLabel = "シリコンバンド（互換品）";
+        } else if (a === "充電ケーブル（未使用／互換品）") {
+            displayLabel = "充電ケーブル（互換品）";
+        }
         
-        document.getElementById('market-target-cost').innerText = "-";
-        document.getElementById('market-sale-min').innerText = "-";
-        document.getElementById('market-sale-max').innerText = "-";
-        document.getElementById('market-profit-min').innerText = "-";
-        document.getElementById('market-profit-max').innerText = "-";
-        document.getElementById('market-margin-min').innerText = "-";
-        document.getElementById('market-margin-max').innerText = "-";
+        displayLabel = displayLabel.replace('（', '<br>（').replace('／', '／<br>').replace('と', 'と<br>');
+        
+        const label = document.createElement('label'); 
+        label.className = 'checkbox-item';
+        label.innerHTML = `<input type="checkbox" value="${a}" onchange="updateUI(); autoGenerate();"><span class="checkbox-label">${displayLabel}</span>`;
+        accGroup.appendChild(label);
+    });
 
-        if (product === "0" || condition === "0") return;
+    const tipGroup = document.getElementById('eartipSizeGroup');
+    tipGroup.innerHTML = '';
+    MASTER.eartipSizes.forEach(s => {
+        const label = document.createElement('label');
+        label.className = 'checkbox-item-multi';
+        label.innerHTML = `<input type="checkbox" value="${s}" onchange="updateUI(); autoGenerate();"><span class="checkbox-label-multi">${s}</span>`;
+        tipGroup.appendChild(label);
+    });
+    
+    const sRank = document.getElementById('shippingRank'); 
+    sRank.innerHTML = '<option value="">選択してください</option>';
+    Object.entries(MASTER.shipping).forEach(([id, r]) => {
+        sRank.innerHTML += `<option value="${id}">${r.label}</option>`;
+    });
+}
 
-        const dbKey = generateDbKey(product, model, color, condition);
-        const marketData = marketDB[dbKey];
+function resetAndFillUI() {
+    ['chargingMethod', 'spec', 'size', 'color', 'detailA', 'detailB', 'detailC', 'detailD', 'ram', 'ssd'].forEach(id => {
+        document.getElementById(id).innerHTML = '<option value="">選択してください</option>';
+    });
+    updateUI();
+}
 
-        if (!marketData) {
-            document.getElementById('market-target-cost').innerText = "データ未登録";
-            document.getElementById('market-target-cost').style.color = "var(--text-gray)";
-            return;
-        }
+function resetAll() {
+    document.getElementById('productId').value = ""; 
+    resetAndFillUI();
+    
+    document.querySelectorAll('#accessoriesGroup input, #eartipSizeGroup input').forEach(cb => { 
+        cb.checked = false; 
+        cb.disabled = false; 
+    });
+    
+    ['appearanceNotes', 'battery', 'bandColor', 'imei', 'detailD'].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+    
+    ['condition', 'warranty', 'shippingRank', 'bandSize', 'bandCondition', 'netRestriction', 'batteryType'].forEach(id => { 
+        document.getElementById(id).value = ""; 
+    });
+    
+    document.getElementById('shippingRank').disabled = false;
+    
+    updateUI(); 
+    autoGenerate(); 
+    showToast("リセットしました");
+}
 
-        const minSalePrice = marketData.min;
-        const maxSalePrice = marketData.max;
+function updateUI() {
+    const pid = document.getElementById('productId').value; 
+    if(!pid) return;
+    
+    const cat = PRODUCTS[pid].cat; 
+    const pName = PRODUCTS[pid].name;
+    const isAirPodsPro = (pName === "Apple AirPods Pro 第2世代" || pName === "Apple AirPods Pro 第3世代");
 
-        document.getElementById('market-sale-min').innerText = minSalePrice.toLocaleString() + " 円";
-        document.getElementById('market-sale-max').innerText = maxSalePrice.toLocaleString() + " 円";
-
-        const targetProfit = condition === "中古" ? 2000 : 1000;
-
-        if (!isNaN(shippingCost) && shippingCost > 0) {
-            const fee = Math.floor(minSalePrice * 0.05);
-            const targetCost = Math.floor(minSalePrice - fee - shippingCost - targetProfit);
-            
-            document.getElementById('market-target-cost').innerText = targetCost.toLocaleString() + " 円";
-            document.getElementById('market-target-cost').style.color = "var(--line-red)";
-
-            function getMetrics(salePrice) {
-                const f = Math.floor(salePrice * 0.05);
-                const p = salePrice - targetCost - f - shippingCost;
-                const m = Math.floor((p / salePrice) * 100);
-                return { profit: p, margin: m };
-            }
-
-            const resMin = getMetrics(minSalePrice);
-            const resMax = getMetrics(maxSalePrice);
-
-            document.getElementById('market-profit-min').innerText = resMin.profit.toLocaleString() + " 円";
-            document.getElementById('market-margin-min').innerText = resMin.margin + " ％";
-            document.getElementById('market-profit-max').innerText = resMax.profit.toLocaleString() + " 円";
-            document.getElementById('market-margin-max').innerText = resMax.margin + " ％";
+    const specVal = document.getElementById('spec').value;
+    const isCellular = (specVal === "GPS Cellular");
+    const condSelect = document.getElementById('condition'); 
+    const isNewCond = (condSelect.value === "未開封の「新品／未使用」状態");
+    
+    const toggle = (id, show) => {
+        document.getElementById(id).classList.toggle('hidden', !show);
+    };
+    
+    toggle('wrapperCharging', MASTER.charging[pid] && cat !== "macbook"); 
+    toggle('wrapperSpec', MASTER.specs[pid] && cat !== "macbook"); 
+    toggle('wrapperSize', MASTER.sizes[pid] && cat !== "macbook"); 
+    toggle('wrapperRam', cat === "macbook");
+    toggle('wrapperSsd', cat === "macbook");
+    
+    // カラーの動的生成 (Max系とそれ以外)
+    let currentColors = MASTER.colors[pid];
+    if (cat === "max") {
+        toggle('wrapperColor', true);
+        if (pid === "15" && specVal === "Lightning") {
+            currentColors = ["スペースグレイ", "シルバー", "スカイブルー", "グリーン", "ピンク"];
+        } else if ((pid === "15" && specVal === "Type-C") || pid === "16") {
+            currentColors = ["ミッドナイト", "スターライト", "ブルー", "パープル", "オレンジ"];
         } else {
-            document.getElementById('market-target-cost').innerText = "配送方法を選択";
-            document.getElementById('market-target-cost').style.color = "var(--text-gray)";
+            currentColors = []; 
         }
-    }
-
-    function resetMarket() {
-        document.getElementById('market-product').selectedIndex = 0;
-        document.getElementById('market-model').selectedIndex = 0;
-        document.getElementById('market-color').selectedIndex = 0;
-        document.getElementById('market-condition').selectedIndex = 0;
-        document.getElementById('market-shipping-method').selectedIndex = 0;
-        calculateMarket();
-    }
-
-    // ==============================================
-    // モーダル・DB登録関連
-    // ==============================================
-    function openDbModal() {
-        document.getElementById('db-product').innerHTML = document.getElementById('market-product').innerHTML;
-        document.getElementById('db-model').innerHTML = document.getElementById('market-model').innerHTML;
-        document.getElementById('db-color').innerHTML = document.getElementById('market-color').innerHTML;
-        document.getElementById('db-shipping').innerHTML = document.getElementById('market-shipping-method').innerHTML;
         
-        document.getElementById('db-product').value = document.getElementById('market-product').value;
-        document.getElementById('db-model').value = document.getElementById('market-model').value;
-        document.getElementById('db-color').value = document.getElementById('market-color').value;
-        document.getElementById('db-condition').value = document.getElementById('market-condition').value;
-        document.getElementById('db-shipping').value = document.getElementById('market-shipping-method').value;
-
-        for (let i = 1; i <= 10; i++) {
-            document.getElementById('db-price' + i).value = '';
+        const colorEl = document.getElementById('color');
+        const currentColor = colorEl.value;
+        colorEl.innerHTML = '<option value="">選択してください</option>';
+        if(currentColors) {
+            currentColors.forEach(v => {
+                const selected = (v === currentColor) ? ' selected' : '';
+                colorEl.innerHTML += `<option value="${v}"${selected}>${v}</option>`;
+            });
         }
-
-        document.getElementById('db-modal').style.display = 'flex';
+    } else {
+        toggle('wrapperColor', !!currentColors);
+        fillSelectOnce('color', currentColors);
+    }
+    
+    if (cat === "watch" && isNewCond) {
+        toggle('wrapperBattery', false);
+    } else {
+        toggle('wrapperBattery', pid !== "11");
+    }
+    
+    toggle('wrapperNet', cat === "iphone" || (cat === "watch" && isCellular));
+    toggle('wrapperBatteryType', cat === "iphone"); 
+    toggle('wrapperIMEI', cat === "iphone");
+    
+    if (cat === "iphone") {
+        document.getElementById('labelSpec').innerHTML = '容量 <span class="required">*</span>';
+    } else {
+        document.getElementById('labelSpec').innerHTML = 'スペック <span class="required">*</span>';
     }
 
-    function closeDbModal() {
-        document.getElementById('db-modal').style.display = 'none';
+    if (cat === "macbook") {
+        document.getElementById('labelA').innerHTML = '詳細A（画面） <span class="required">*</span>';
+        document.getElementById('labelB').innerHTML = '詳細B（キーボード／トラックパッド） <span class="required">*</span>';
+        document.getElementById('labelC').innerHTML = '詳細C（天板／側面／底面） <span class="required">*</span>';
+    } else if (cat === "max") {
+        document.getElementById('labelA').innerHTML = '詳細A（外装） <span class="required">*</span>';
+        document.getElementById('labelB').innerHTML = '詳細B（ヘッドバンド） <span class="required">*</span>';
+        document.getElementById('labelC').innerHTML = '詳細C（イヤーカップ） <span class="required">*</span>';
+        document.getElementById('labelD').innerHTML = '詳細D（ケース） <span class="required">*</span>';
+    } else {
+        document.getElementById('labelA').innerHTML = '詳細A <span class="required">*</span>';
+        document.getElementById('labelB').innerHTML = '詳細B <span class="required">*</span>';
+        document.getElementById('labelC').innerHTML = '詳細C <span class="required">*</span>';
+        document.getElementById('labelD').innerHTML = '詳細D（イヤーチップ） <span class="required">*</span>';
+    }
+    
+    fillSelectOnce('chargingMethod', MASTER.charging[pid]); 
+    fillSelectOnce('spec', MASTER.specs[pid]); 
+    fillSelectOnce('size', MASTER.sizes[pid]); 
+    fillSelectOnce('ram', MASTER.rams[pid]);
+    fillSelectOnce('ssd', MASTER.ssds[pid]);
+    
+    if (["5", "6", "7", "8", "12", "15", "16"].includes(pid)) {
+        document.getElementById('batteryLabel').innerHTML = '10分間の消費バッテリー（%） <span class="required">*</span>';
+    } else {
+        document.getElementById('batteryLabel').innerHTML = 'バッテリー最大容量（%） <span class="required">*</span>';
+    }
+    
+    const accCheckboxes = document.querySelectorAll('#accessoriesGroup input');
+    const checkedAccs = Array.from(accCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+    const sRank = document.getElementById('shippingRank');
+    
+    if (cat === "macbook" || cat === "max") {
+        sRank.value = "D";
+        sRank.disabled = true;
+    } else {
+        sRank.disabled = false;
     }
 
-    function resetDbModal() {
-        document.getElementById('db-product').selectedIndex = 0;
-        document.getElementById('db-model').selectedIndex = 0;
-        document.getElementById('db-color').selectedIndex = 0;
-        document.getElementById('db-condition').selectedIndex = 0;
-        document.getElementById('db-shipping').selectedIndex = 0;
-        for (let i = 1; i <= 10; i++) {
-            document.getElementById('db-price' + i).value = '';
+    if (cat === "pencil") {
+        condSelect.value = "未開封の「新品／未使用」状態"; 
+        condSelect.disabled = true;
+        accCheckboxes.forEach(cb => { 
+            cb.checked = (cb.value === "新品同梱品と同じ"); 
+            cb.disabled = true; 
+        });
+        toggle('appearancePanel', false);
+    } else {
+        condSelect.disabled = false; 
+        accCheckboxes.forEach(cb => {
+            cb.disabled = false;
+        });
+        
+        toggle('appearancePanel', condSelect.value !== "未開封の「新品／未使用」状態");
+        
+        if(condSelect.value !== "未開封の「新品／未使用」状態") {
+            let groupKey = cat;
+            if (["5", "6", "7", "8"].includes(pid)) groupKey = "audio";
+            
+            const group = MASTER.details[groupKey]; 
+            if(group) { 
+                fillDetail('A', group.A); 
+                fillDetail('B', group.B); 
+                fillDetail('C', group.C); 
+                if(group.D) fillDetail('D', group.D);
+            }
         }
     }
+    
+    const hasSportsBand = checkedAccs.includes("スポーツバンド（アップル純正）");
+    toggle('bandDetails', hasSportsBand);
 
-    function saveToDb() {
-        const product = document.getElementById('db-product').value;
-        const model = document.getElementById('db-model').value;
-        const color = document.getElementById('db-color').value;
-        const condition = document.getElementById('db-condition').value;
-        const shipping = document.getElementById('db-shipping').value;
+    const hasEarTip = checkedAccs.includes("イヤーチップ");
+    const showEarTipPanel = isAirPodsPro && hasEarTip;
+    toggle('eartipDetails', showEarTipPanel);
 
-        if (product === "0" || condition === "0") {
-            alert("製品名と状態は必ず選択してください。");
-            return;
+    const eartipCheckboxes = Array.from(document.querySelectorAll('#eartipSizeGroup input:checked')).map(cb => cb.value);
+    const hasUnusedOrCompat = eartipCheckboxes.includes("未使用／互換品");
+    
+    if (cat === "max" && !isNewCond) {
+        toggle('boxD', true);
+    } else if (showEarTipPanel && !hasUnusedOrCompat && !isNewCond) {
+        toggle('boxD', true);
+    } else {
+        toggle('boxD', false);
+    }
+}
+
+function fillSelectOnce(id, arr) {
+    const el = document.getElementById(id); 
+    if(!arr || el.options.length > 1) return;
+    arr.forEach(v => {
+        el.innerHTML += `<option value="${v}">${v}</option>`;
+    });
+}
+
+function fillDetail(suffix, arr) {
+    const el = document.getElementById('detail' + suffix); 
+    if(!arr || el.options.length > 1) return;
+    el.innerHTML = '<option value="">-- 選択してください --</option>'; 
+    arr.forEach(v => {
+        el.innerHTML += `<option value="${v}">${v}</option>`;
+    });
+}
+
+function getKeywords(pid, spec, charging, color) {
+    const p = PRODUCTS[pid]; 
+    if (!p) return ""; 
+    
+    const cat = p.cat;
+    if (pid === "13") {
+        return `Apple iPhone13 mini ${spec} SIMフリー ${color} iPhone13mini`;
+    }
+    
+    const name = p.name; 
+    const c2 = spec || charging; 
+    const e2 = color;
+    
+    if (name === "Apple AirPods Pro 第2世代" && c2 === "Lightning") return "MQD83J/A エアポッツプロ AirPodsPro2";
+    if (name === "Apple AirPods Pro 第2世代" && c2 === "Type-C") return "MTJV3J/A エアポッツプロ AirPodsPro2";
+    if (name === "Apple AirPods 4") return "MXP63J/A エアポッツ AirPods4 エアポッズ";
+    if (name === "Apple AirPods 4 ANC") return "MXP93J/A エアポッツ AirPods4 エアポッズ";
+    if (cat === "watch") return "アップルウォッチ applewatch";
+    if (name === "Apple Pencil 第1世代") return "MK0C2JA MYQW3JA アップルペンシル";
+    if (name === "Apple Pencil 第2世代") return "MU8F2JA MXN43JA アップルペンシル";
+    
+    if (name === "Apple HomePod mini") {
+        let modelNum = "";
+        if (color === "ホワイト") modelNum = "MY5H2J/A";
+        else if (color === "スペースグレイ") modelNum = "MY5G2J/A";
+        else if (color === "ブルー") modelNum = "MJ2C3J/A";
+        else if (color === "オレンジ") modelNum = "MJ2D3J/A";
+        else if (color === "イエロー") modelNum = "MJ2E3J/A";
+        else if (color === "ミッドナイト") modelNum = "MTJT3J/A";
+        return `ホームポッドミニ HomePodmini ${modelNum}`;
+    }
+    
+    if (pid === "12") return `${color} マジックトラックパッド`;
+    
+    return "";
+}
+
+function validateInputs() {
+    const pid = document.getElementById('productId').value; 
+    if(!pid) return false;
+    
+    const cat = PRODUCTS[pid].cat; 
+    const specVal = document.getElementById('spec').value;
+    const isCellular = (specVal === "GPS Cellular");
+    
+    if(!document.getElementById('wrapperCharging').classList.contains('hidden') && !document.getElementById('chargingMethod').value) return false;
+    if(!document.getElementById('wrapperSpec').classList.contains('hidden') && !document.getElementById('spec').value) return false;
+    if(!document.getElementById('wrapperSize').classList.contains('hidden') && !document.getElementById('size').value) return false;
+    if(!document.getElementById('wrapperRam').classList.contains('hidden') && !document.getElementById('ram').value) return false;
+    if(!document.getElementById('wrapperSsd').classList.contains('hidden') && !document.getElementById('ssd').value) return false;
+    if(!document.getElementById('wrapperColor').classList.contains('hidden') && !document.getElementById('color').value) return false;
+    
+    const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked'));
+    if(checkedAccs.length === 0) return false;
+    
+    if(cat === "iphone") { 
+        if(!document.getElementById('batteryType').value || !document.getElementById('netRestriction').value || !document.getElementById('imei').value) {
+            return false; 
         }
+    }
+    
+    if(cat === "watch" && isCellular && !document.getElementById('netRestriction').value) return false;
+    
+    if(!document.getElementById('bandDetails').classList.contains('hidden')) { 
+        if(!document.getElementById('bandSize').value || !document.getElementById('bandCondition').value) return false; 
+    }
 
-        let prices = [];
-        for (let i = 1; i <= 10; i++) {
-            let val = parseFloat(document.getElementById('db-price' + i).value);
-            if (!isNaN(val) && val > 0) {
-                prices.push(val);
+    if(!document.getElementById('eartipDetails').classList.contains('hidden')) {
+        const checkedEartips = Array.from(document.querySelectorAll('#eartipSizeGroup input:checked'));
+        if (checkedEartips.length === 0) return false;
+    }
+    
+    const cond = document.getElementById('condition').value; 
+    if(!cond) return false;
+    
+    if(cond !== "未開封の「新品／未使用」状態") { 
+        if(!document.getElementById('detailA').value || !document.getElementById('detailB').value || !document.getElementById('detailC').value) {
+            return false; 
+        }
+        if(!document.getElementById('boxD').classList.contains('hidden') && !document.getElementById('detailD').value) {
+            return false;
+        }
+    }
+    
+    if(!document.getElementById('wrapperBattery').classList.contains('hidden') && !document.getElementById('battery').value) return false;
+    if(!document.getElementById('shippingRank').value) return false;
+    
+    return true;
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast'); 
+    toast.innerText = message; 
+    toast.classList.add('show');
+    setTimeout(() => { 
+        toast.classList.remove('show'); 
+    }, 1000);
+}
+
+function autoGenerate() {
+    if(!validateInputs()) { 
+        document.getElementById('output-wrapper').classList.add('hidden'); 
+        return; 
+    }
+    
+    const pid = document.getElementById('productId').value; 
+    const cond = document.getElementById('condition').value; 
+    const ship = document.getElementById('shippingRank').value; 
+    const p = PRODUCTS[pid]; 
+    const cat = p.cat;
+    const pName = p.name;
+    const spec = document.getElementById('spec').value; 
+    const charging = document.getElementById('chargingMethod').value;
+    const size = document.getElementById('size').value;
+    const ramVal = document.getElementById('ram').value;
+    const ssdVal = document.getElementById('ssd').value;
+    const color = document.getElementById('color').value;
+    
+    const kw = getKeywords(pid, spec, charging, color); 
+    const checkedAccs = Array.from(document.querySelectorAll('#accessoriesGroup input:checked')).map(i => i.value); 
+    const checkedEartips = Array.from(document.querySelectorAll('#eartipSizeGroup input:checked')).map(i => i.value);
+    const isNewBundle = checkedAccs.includes("新品同梱品と同じ"); 
+    const isNewCond = (cond === "未開封の「新品／未使用」状態");
+    
+    const isAirPodsPro = (pName === "Apple AirPods Pro 第2世代" || pName === "Apple AirPods Pro 第3世代");
+    const isAirPods系 = (cat === "airpods");
+    
+    let titleLine = "";
+    let bodyTitleLine = "";
+    
+    if (cat === "iphone") {
+        titleLine = kw;
+        bodyTitleLine = titleLine;
+    } else if (cat === "macbook") {
+        let modelNum = "";
+        if (color === "シルバー") modelNum = "MGN93J/A";
+        else if (color === "スペースグレイ") modelNum = "MGN63J/A";
+        else if (color === "ゴールド") modelNum = "MGND3J/A";
+        
+        titleLine = `Apple M1 MacBook Air Retina 13.3 ${modelNum} ${color} ${ramVal} ${ssdVal}`;
+        bodyTitleLine = `Apple M1 MacBookAir 13インチ ${modelNum} ${color} ${ramVal} ${ssdVal} マックブック Mac`;
+    } else if (cat === "max") {
+        let modelNum = "";
+        if (pid === "15" && spec === "Lightning") {
+            if(color==="スペースグレイ") modelNum="MGYH3J/A";
+            if(color==="シルバー") modelNum="MGYJ3J/A";
+            if(color==="スカイブルー") modelNum="MGYL3J/A";
+            if(color==="グリーン") modelNum="MGYN3J/A";
+            if(color==="ピンク") modelNum="MGYM3J/A";
+        } else if (pid === "15" && spec === "Type-C") {
+            if(color==="ミッドナイト") modelNum="MWW43ZA/A";
+            if(color==="スターライト") modelNum="MWW53ZA/A";
+            if(color==="ブルー") modelNum="MWW63ZA/A";
+            if(color==="パープル") modelNum="MWW83ZA/A";
+            if(color==="オレンジ") modelNum="MWW73ZA/A";
+        } else if (pid === "16") {
+            if(color==="ミッドナイト") modelNum="MHWK4ZA/A";
+            if(color==="スターライト") modelNum="MHWL4ZA/A";
+            if(color==="ブルー") modelNum="MHWM4ZA/A";
+            if(color==="パープル") modelNum="MHWP4ZA/A";
+            if(color==="オレンジ") modelNum="MHWN4ZA/A";
+        }
+        titleLine = `${p.name} ${spec} ${color} ${modelNum} エアポッズマックス`;
+        
+        let specAlias = spec === "Lightning" ? "ライトニング" : "USB-C";
+        let genText = pid === "15" ? "第一世代" : "第二世代";
+        bodyTitleLine = `アップル AirPodsMax ${genText} エアポッズ ${specAlias}`;
+    } else {
+        titleLine = `${p.name} ${charging} ${spec} ${size} ${color} ${kw}`.replace(/\s+/g, ' ').trim();
+        bodyTitleLine = titleLine;
+    }
+    
+    let bodyText = bodyTitleLine + "\n\n━━━━━━━━━━━━━━━━━━━━\n商品説明\n━━━━━━━━━━━━━━━━━━━━\n";
+    
+    if (cat === "macbook") {
+        bodyText += `13.3インチ、RetinaディスプレイのM1モデル。\nメモリは${ramVal}で、ストレージは${ssdVal}です。\n\n`;
+    }
+    
+    bodyText += "【同梱物】\n";
+    
+    if (!isNewBundle) {
+        if (isAirPods系) {
+            bodyText += "・本体（左右）\n";
+        } else {
+            bodyText += "・本体\n";
+        }
+    }
+    
+    checkedAccs.forEach(a => {
+        if (a === "イヤーチップ" && isAirPodsPro && checkedEartips.length > 0) {
+            bodyText += `・イヤーチップ（${checkedEartips.join("／")}）\n`;
+        } else {
+            bodyText += `・${a}\n`;
+        }
+    }); 
+    
+    if(!isNewBundle) {
+        if (cat === "watch" && checkedAccs.includes("外箱／リーフレット") && checkedAccs.includes("充電ケーブル（アップル純正）")) {
+            bodyText += "\n※新品同梱品と同じ内容を発送します。\n";
+        } else {
+            bodyText += "\n※未記載の物（外箱・説明書等）は発送できません。\n";
+        }
+        
+        const hasCable = checkedAccs.includes("充電ケーブル（未使用／互換品）");
+        const hasBand = checkedAccs.includes("シリコンバンド（未使用／互換品）");
+        
+        if (hasCable || hasBand) {
+            bodyText += "\n";
+            if (hasCable && hasBand) {
+                bodyText += "※シリコンバンド／充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
+            } else if (hasCable) {
+                bodyText += "※充電ケーブルは、撮影及び動作確認を行う際、一時的に開封していますのでご了承ください。\n";
+            } else if (hasBand) {
+                bodyText += "※シリコンバンドは、撮影を行う際、一時的に開封していますのでご了承ください。\n";
+            }
+        }
+    }
+    
+    bodyText += `\n【外観状態】\n■${cond}\n`;
+    
+    if (cat === "watch" && isNewCond) {
+        bodyText += "・アクティベーションは行なっていません。\n　Apple製品限定保証は、初期設定日から1年間となります。\n";
+    } else {
+        if(!isNewCond) { 
+            bodyText += `${document.getElementById('detailA').value}\n${document.getElementById('detailB').value}\n${document.getElementById('detailC').value}\n`;
+            
+            if(!document.getElementById('boxD').classList.contains('hidden')) {
+                bodyText += `${document.getElementById('detailD').value}\n`;
             }
         }
 
-        if (prices.length === 0) {
-            alert("実績を1件以上入力してください。");
-            return;
+        const notes = document.getElementById('appearanceNotes').value; 
+        if(notes) {
+            bodyText += `・${notes}\n`;
         }
-
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-
-        const dbKey = generateDbKey(product, model, color, condition);
-        marketDB[dbKey] = {
-            min: minPrice,
-            max: maxPrice,
-            shipping: shipping // 配送方法を保存
-        };
-
-        localStorage.setItem('marketDB', JSON.stringify(marketDB));
-
-        alert("相場データを登録しました！");
-        closeDbModal();
-
-        document.getElementById('market-product').value = product;
-        document.getElementById('market-model').value = model;
-        document.getElementById('market-color').value = color;
-        document.getElementById('market-condition').value = condition;
-        document.getElementById('market-shipping-method').value = shipping;
         
-        calculateMarket();
+        if(!isNewCond) { 
+            if (checkedAccs.includes("スポーツバンド（アップル純正）")) { 
+                const bSize = document.getElementById('bandSize').value; 
+                const bColor = document.getElementById('bandColor').value; 
+                const bCond = document.getElementById('bandCondition').value; 
+                
+                if (bSize && bCond) {
+                    let colorText = bColor ? `「${bColor}」` : "";
+                    bodyText += `スポーツバンド「${bSize}」サイズの${colorText}は、${bCond}\n`; 
+                }
+            } 
+            
+            bodyText += "\n※簡易清掃を行なった上で、撮影を行なっています。\n　画像に写らない微細な傷等がある場合がありますので、ご了承ください。\n\n■動作不良・機能不具合等は、ありません。\n"; 
+        }
+        
+        const bVal = document.getElementById('battery').value;
+        if(pid !== "11" && bVal) {
+            if(isAirPodsPro || pName === "Apple AirPods 4 ANC" || cat === "max") {
+                bodyText += `・バッテリーは、10分の音楽再生（ANC）で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
+            } else if(["5", "6"].includes(pid)) {
+                bodyText += `・バッテリーは、10分の音楽再生で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
+            } else if(pid === "12") {
+                bodyText += `・バッテリーは、10分の接続で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
+            } else {
+                bodyText += `・バッテリー最大容量は「${bVal}%」です。\n`;
+            }
+        }
+        
+        if(cat === "iphone") { 
+            bodyText += document.getElementById('batteryType').value + "\n"; 
+        }
+        
+        let initMsg = "";
+        if (cat === "iphone") {
+            initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
+        } else if (cat === "watch") {
+            initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
+        } else if (cat === "macbook") {
+            initMsg = "・初期化、アクティベーションロック／アカウント連携解除済み\n";
+        } else if (["5", "6", "7", "8"].includes(pid) || cat === "max") {
+            initMsg = "・本体の初期化、アカウント連携解除済み（探す機能、使用可能）\n";
+        } else {
+            initMsg = "・本体のリセット済み\n";
+        }
+        
+        if (!isNewBundle) {
+            bodyText += initMsg;
+        }
     }
-</script>
 
+    const net = document.getElementById('netRestriction').value;
+    if (net) {
+        bodyText += `\n■ネットワーク利用制限「${net}」\n`;
+        if (cat === "iphone") {
+            const imei = document.getElementById('imei').value;
+            bodyText += `（IMEI：${imei}）\n`;
+            if (net === "○") {
+                bodyText += "・国内キャリア版で残債、利用制限はありません。\n";
+            } else {
+                bodyText += "・Apple直販国内モデルで利用制限はありません。\n";
+            }
+            bodyText += "（SIMロック解除済みなので、お好きなキャリアで利用可能です）\n";
+        } else {
+            if (net === "○") {
+                bodyText += "・国内キャリア版で残債、利用制限はありません。\n";
+            } else {
+                bodyText += "・Apple直販国内モデルで利用制限はありません。\n";
+            }
+        }
+    }
+    
+    const warranty = document.getElementById('warranty').value; 
+    if(warranty) { 
+        bodyText += `\n■${warranty}\n`; 
+        if (warranty === "Apple Care Service") {
+            bodyText += "（AppleCare+の通信キャリア版で保証内容は同等です）\n";
+        } else if (warranty === "AppleCare+") {
+            bodyText += "（故障・盗難・紛失時に割安でサポート対応）\n";
+        } else {
+            bodyText += "（自然故障であれば無償で修理が可能です）\n";
+        }
+    }
+
+    bodyText += "\n━━━━━━━━━━━━━━━━━━━━\n発送／補償\n━━━━━━━━━━━━━━━━━━━━\n・15時までの支払い完了で【当日発送】します。\n\n■お支払い方法\n・PayPay\n・クレジットカード\n※クレジットカードの承認は、4時間程度かかります。\n　承認が15:00以降の場合は、翌日発送となります。\n\n";
+    bodyText += MASTER.shipping[ship].text + "\n\n";
+    
+    const commonFooter = "━━━━━━━━━━━━━━━━━━━━\n出品直後でも価格交渉歓迎！\n━━━━━━━━━━━━━━━━━━━━\n無視、ブロックはしませんので何度でもご相談ください。";
+    
+    if(isNewCond) {
+        bodyText += `${commonFooter}\n\n※新品・未開封品ですが、万が一初期不良があった場合はご連絡ください。`; 
+    } else {
+        bodyText += `${commonFooter}\n\n※商品説明にない動作不良や機能不具合があった場合は、返品／返金します。`;
+    }
+    
+    if (warranty) {
+        bodyText += "\n\n※Appleの保証内容は出品時点の情報です。適用条件や契約状況を確約するものではありません。";
+    }
+
+    document.getElementById('output-wrapper').classList.remove('hidden');
+    document.getElementById('output-title').innerText = titleLine; 
+    document.getElementById('output-body').innerText = bodyText;
+    
+    const updateCount = (id, current, max, label) => {
+        const el = document.getElementById(id); 
+        let countHtml = "";
+        if (current > max) {
+            countHtml = `<span class="count-over">${current}</span>`;
+        } else {
+            countHtml = `<span>${current}</span>`;
+        }
+        el.innerHTML = `${label}: ${countHtml}/${max}`;
+    };
+    
+    updateCount('title-char-count', titleLine.length, 65, 'タイトル'); 
+    updateCount('body-char-count', bodyText.length, 1000, '本文');
+}
+
+function processCopy(type) {
+    const title = document.getElementById('output-title').innerText;
+    const body = document.getElementById('output-body').innerText;
+    if (type === 'title') {
+        navigator.clipboard.writeText(title).then(() => showToast("タイトルをコピーしました"));
+    } else {
+        navigator.clipboard.writeText(body).then(() => showToast("本文をコピーしました"));
+    }
+}
+
+init();
+</script>
 </body>
 </html>
