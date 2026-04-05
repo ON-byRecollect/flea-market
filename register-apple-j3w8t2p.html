@@ -1007,11 +1007,11 @@ function autoGenerate() {
         const bVal = document.getElementById('battery').value;
         if(pid !== "11" && bVal) {
             if(isAirPodsPro || pName === "Apple AirPods 4 ANC" || cat === "max") {
-                bodyText += `・バッテリーは、10分の音楽再生（ANC）で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
+                bodyText += `・バッテリーは、10分の音楽再生（ANC）で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
             } else if(["5", "6"].includes(pid)) {
-                bodyText += `・バッテリーは、10分の音楽再生で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
+                bodyText += `・バッテリーは、10分の音楽再生で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
             } else if(pid === "12") {
-                bodyText += `・バッテリーは、10分の接続で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n`;
+                bodyText += `・バッテリーは、10分の接続で約${bVal}％消費\n※製品仕様上、バッテリー最大容量は数値化できません。\n\n`;
             } else {
                 bodyText += `・バッテリー最大容量は「${bVal}%」です。\n`;
             }
@@ -1023,7 +1023,7 @@ function autoGenerate() {
         
         let initMsg = "";
         if (cat === "iphone") {
-            initMsg = "\n・本体の初期化、アクティベーションロック解除済み\n";
+            initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
         } else if (cat === "watch") {
             initMsg = "・本体の初期化、アクティベーションロック解除済み\n";
         } else if (cat === "macbook") {
