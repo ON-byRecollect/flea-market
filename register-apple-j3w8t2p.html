@@ -309,20 +309,23 @@ const PRODUCTS = {
     "6": { name: "Apple AirPods 4 ANC", cat: "airpods" }, 
     "7": { name: "Apple AirPods Pro 第2世代", cat: "airpods" }, 
     "8": { name: "Apple AirPods Pro 第3世代", cat: "airpods" }, 
+    "15": { name: "Apple AirPods Max（第1世代）", cat: "max" },
+    "16": { name: "Apple AirPods Max（第2世代）", cat: "max" },
     "9": { name: "Apple Pencil 第1世代", cat: "pencil" }, 
     "10": { name: "Apple Pencil 第2世代", cat: "pencil" }, 
     "11": { name: "Apple HomePod mini", cat: "homepod" }, 
     "12": { name: "Apple Magic Trackpad 3 (Multi-Touch対応)", cat: "trackpad" }, 
     "13": { name: "Apple iPhone13 mini", cat: "iphone" },
-    "14": { name: "MacBook Air 13.3 M1", cat: "macbook" },
-    "15": { name: "Apple AirPods Max（第1世代）", cat: "max" },
-    "16": { name: "Apple AirPods Max（第2世代）", cat: "max" }
+    "17": { name: "Apple iPhoneSE 2", cat: "iphone" },
+    "18": { name: "Apple iPhoneSE 3", cat: "iphone" },
+    "14": { name: "MacBook Air 13.3 M1", cat: "macbook" }
 };
 
 const MASTER = {
     specs: { 
         "1": ["GPS", "GPS Cellular"], "2": ["GPS", "GPS Cellular"], "3": ["GPS", "GPS Cellular"], "4": ["GPS", "GPS Cellular"], 
-        "7": ["Lightning", "Type-C"], "13": ["64GB", "128GB", "256GB"], "15": ["Lightning", "Type-C"], "16": ["Type-C"]
+        "7": ["Lightning", "Type-C"], "13": ["64GB", "128GB", "256GB"], "15": ["Lightning", "Type-C"], "16": ["Type-C"],
+        "17": ["64GB", "128GB", "256GB"], "18": ["64GB", "128GB", "256GB"]
     },
     rams: { "14": ["8GB", "16GB", "32GB"] },
     ssds: { "14": ["128GB", "256GB", "512GB"] },
@@ -332,7 +335,10 @@ const MASTER = {
     },
     colors: { 
         "1": ["ミッドナイト", "スターライト", "シルバー"], "2": ["ミッドナイト", "スターライト"], "3": ["ジェットブラック", "シルバー", "ローズゴールド"], "4": ["ジェットブラック", "シルバー", "ローズゴールド", "スペースグレイ"], 
-        "11": ["ホワイト", "スペースグレイ", "ブルー", "オレンジ", "イエロー", "ミッドナイト"], "12": ["ホワイト", "ブラック"], "13": ["スターライト", "レッド", "ミッドナイト", "ブルー", "ピンク", "グリーン"],
+        "11": ["ホワイト", "スペースグレイ", "ブルー", "オレンジ", "イエロー", "ミッドナイト"], "12": ["ホワイト", "ブラック"], 
+        "13": ["スターライト", "レッド", "ミッドナイト", "ブルー", "ピンク", "グリーン"],
+        "17": ["スターライト", "ミッドナイト", "レッド"],
+        "18": ["スターライト", "ミッドナイト", "レッド"],
         "14": ["スペースグレイ", "シルバー", "ゴールド"]
     },
     shipping: { 
@@ -508,12 +514,17 @@ function init() {
     const pSel = document.getElementById('productId'); 
     pSel.innerHTML = '<option value="">選択してください</option>';
     
-    // 表示順の指定
-    const order = ["1", "2", "3", "4", "5", "6", "7", "8", "15", "16", "9", "10", "11", "12", "13", "14"];
+    // 表示順
+    const order = ["1", "2", "3", "4", "5", "6", "7", "8", "15", "16", "9", "10", "11", "12", "13", "17", "18", "14"];
     order.forEach(id => {
         const p = PRODUCTS[id];
         if (p) {
-            pSel.innerHTML += `<option value="${id}">${p.name}</option>`;
+            let displayName = p.name;
+            // Watch系以外は先頭の「Apple 」をプルダウン表示から削除
+            if (p.cat !== "watch" && displayName.startsWith("Apple ")) {
+                displayName = displayName.replace("Apple ", "");
+            }
+            pSel.innerHTML += `<option value="${id}">${displayName}</option>`;
         }
     });
     
@@ -606,7 +617,6 @@ function updateUI() {
     toggle('wrapperRam', cat === "macbook");
     toggle('wrapperSsd', cat === "macbook");
     
-    // カラーの動的生成 (Max系とそれ以外)
     let currentColors = MASTER.colors[pid];
     if (cat === "max") {
         toggle('wrapperColor', true);
@@ -758,8 +768,11 @@ function getKeywords(pid, spec, charging, color) {
     if (!p) return ""; 
     
     const cat = p.cat;
-    if (pid === "13") {
-        return `Apple iPhone13 mini ${spec} SIMフリー ${color} iPhone13mini`;
+    // iPhone系（13mini, SE2, SE3）
+    if (["13", "17", "18"].includes(pid)) {
+        const pSimpleName = p.name.replace("Apple ", "");
+        const suffix = pSimpleName.replace(/\s+/g, "").toLowerCase();
+        return `Apple ${pSimpleName} ${spec} SIMフリー ${color} ${suffix}`;
     }
     
     const name = p.name; 
@@ -884,8 +897,16 @@ function autoGenerate() {
     let bodyTitleLine = "";
     
     if (cat === "iphone") {
-        titleLine = kw;
-        bodyTitleLine = titleLine;
+        titleLine = kw; // "Apple iPhone13 mini 64GB SIMフリー スターライト iPhone13mini"
+        
+        // 本文タイトルの英語変換マップ
+        const enColors = { "スターライト": "Starlight", "ミッドナイト": "Midnight", "レッド": "Red", "ブルー": "Blue", "ピンク": "Pink", "グリーン": "Green" };
+        let colorEn = enColors[color] || color;
+        
+        // スペース調整 (iPhone13 -> iPhone 13)
+        let nameWithSpace = p.name.replace("Apple ", "").replace("iPhone", "iPhone ");
+        bodyTitleLine = `アップル ${nameWithSpace} ${spec} SIMフリー ${colorEn} アイフォン`;
+        
     } else if (cat === "macbook") {
         let modelNum = "";
         if (color === "シルバー") modelNum = "MGN93J/A";
